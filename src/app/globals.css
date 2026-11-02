@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/*
+ * 디자인 기본값. 여기만 바꾸면 화면 전체에 반영됩니다.
+ * - 브랜드 색: 아래 brand 값의 "indigo"를 Tailwind 기본 색 이름(blue, violet, emerald, teal 등)으로 바꾸면 됩니다.
+ * - 글꼴: --font-sans
+ */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-brand-50: var(--color-indigo-50);
+  --color-brand-100: var(--color-indigo-100);
+  --color-brand-200: var(--color-indigo-200);
+  --color-brand-300: var(--color-indigo-300);
+  --color-brand-400: var(--color-indigo-400);
+  --color-brand-500: var(--color-indigo-500);
+  --color-brand-600: var(--color-indigo-600);
+  --color-brand-700: var(--color-indigo-700);
+  --color-brand-800: var(--color-indigo-800);
+  --color-brand-900: var(--color-indigo-900);
+}
+
+body {
+  background: var(--color-slate-50);
+  color: var(--color-slate-900);
+  /* 한글이 글자 중간에서 줄바꿈되지 않고 띄어쓰기 단위로 넘어가게 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
