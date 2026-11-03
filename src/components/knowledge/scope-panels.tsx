@@ -65,7 +65,7 @@ export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: Pane
           { label: "스페이스 자료", detail: `${docs.filter((d) => d.projectId).length}개 · 그 스페이스에만` },
           { label: "스페이스 대화", detail: `채팅방 ${linkedChats} · ${rangeLabel(range)}` },
         ]}
-        note="앞 단계가 먼저 적용되고, 내용이 서로 다르면 앞 단계를 따라요. 고객사 공통 자료, 스페이스 자료와 대화는 왼쪽에서 회사·스페이스를 골라 봐요."
+        note="모든 고객사·스페이스 답장이 이 순서를 따라요. 앞 단계가 먼저 적용되고, 내용이 서로 다르면 앞 단계를 따라요."
       />
       <Section icon={ShieldCheck} title="회사 기준" count={standard.length} desc="말투, 응대 원칙, 단가처럼 모든 답장이 지켜야 하는 자료예요. 팀장이 정해요.">
         <DocTable docs={standard} onOpen={onOpenDoc} />
@@ -148,22 +148,17 @@ export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "rang
           </Link>
         }
       />
-      <SearchOrder
-        title={`${account.name} 스페이스 답장에 AI가 찾아보는 순서`}
-        steps={[
-          { label: "회사 기준", detail: `${docs.filter((d) => docLayer(d) === "standard").length}개`, onClick: toCompany },
-          { label: "회사 자료", detail: `${docs.filter((d) => docLayer(d) === "company").length}개`, onClick: toCompany },
-          { label: "이 회사 공통 자료", detail: `${common.length}개` },
-          { label: "그 스페이스 자료", detail: "답하는 스페이스만" },
-          { label: "그 스페이스 대화", detail: "답하는 스페이스만" },
+      <AlsoUses
+        items={[
+          { label: `회사 기준 ${docs.filter((d) => docLayer(d) === "standard").length}`, onClick: toCompany },
+          { label: `회사 자료 ${docs.filter((d) => docLayer(d) === "company").length}`, onClick: toCompany },
         ]}
-        note="같은 회사라도 다른 스페이스 자료는 섞지 않아요. 여러 스페이스에 반복해 쓰는 자료는 공통 자료로 올려요."
       />
       <Section
         icon={Building2}
         title="공통 자료"
         count={common.length}
-        desc="계약 조건, 출입 수칙, 보안 요구사항처럼 이 회사 모든 스페이스 답장에 참고하는 자료예요."
+        desc="계약 조건, 출입 수칙, 보안 요구사항처럼 여러 스페이스에 반복해 쓰는 자료예요. 이 회사 모든 스페이스 답장에 참고해요."
       >
         {common.length === 0 ? (
           <Empty>아직 없어요. 위쪽 자료 올리기에서 &ldquo;고객사 공통 자료&rdquo;로 올려요.</Empty>
@@ -202,7 +197,7 @@ export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "rang
           </div>
         )}
       </Section>
-      <Section icon={BookOpen} title="스페이스 자료 모아 보기" count={projectDocs.length} desc="스페이스마다 쌓인 자료를 한 번에 봐요.">
+      <Section icon={BookOpen} title="스페이스 자료 모아 보기" count={projectDocs.length} desc="스페이스마다 쌓인 자료를 한 번에 봐요. 답장에는 그 스페이스 자료만 써요.">
         <DocTable docs={projectDocs} onOpen={onOpenDoc} showProject />
       </Section>
     </div>
@@ -242,25 +237,20 @@ export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { 
           </Link>
         }
       />
-      <SearchOrder
-        title="이 스페이스 답장에 AI가 찾아보는 순서"
-        steps={[
-          { label: "회사 기준", detail: `${docs.filter((d) => docLayer(d) === "standard").length}개`, onClick: toCompany },
-          { label: "회사 자료", detail: `${docs.filter((d) => docLayer(d) === "company").length}개`, onClick: toCompany },
+      <AlsoUses
+        items={[
+          { label: `회사 기준 ${docs.filter((d) => docLayer(d) === "standard").length}`, onClick: toCompany },
+          { label: `회사 자료 ${docs.filter((d) => docLayer(d) === "company").length}`, onClick: toCompany },
           {
-            label: `${account.name} 공통 자료`,
-            detail: `${docs.filter((d) => d.accountId === account.id).length}개`,
+            label: `${account.name} 공통 자료 ${docs.filter((d) => d.accountId === account.id).length}`,
             onClick: () => onSelect({ kind: "account", id: account.id }),
           },
-          { label: "이 스페이스 자료", detail: `${projectDocs.length}개` },
-          { label: "이 스페이스 대화", detail: `채팅방 ${rooms.length} · ${rangeLabel(range)}` },
         ]}
-        note="비슷한 문의가 오면 다른 스페이스의 해결된 사례도 찾아봐요."
       />
       <Section icon={BookOpen} title="스페이스 자료" count={projectDocs.length} desc="이 스페이스 답장에만 써요. 메일·메신저 첨부는 자동으로 쌓여요.">
         <DocTable docs={projectDocs} onOpen={onOpenDoc} />
       </Section>
-      <Section icon={MessagesSquare} title="대화" count={rooms.length} desc="연결한 채팅방에서 이 스페이스로 쌓인 메시지만 써요. 개인 대화로 표시한 메시지는 빠져요.">
+      <Section icon={MessagesSquare} title="대화" count={rooms.length} desc={`연결한 채팅방에서 이 스페이스로 쌓인 메시지만 써요(${rangeLabel(range)}). 개인 대화로 표시한 메시지는 빠져요.`}>
         {rooms.length === 0 ? (
           <Empty>연결한 채팅방이 없어요. 스페이스 화면의 채팅방 탭에서 연결해요.</Empty>
         ) : (
@@ -384,44 +374,46 @@ function ScopeHeader({
   );
 }
 
-/** AI가 이 범위에서 답장할 때 찾아보는 순서. 앞 단계가 먼저 적용되고, 서로 다르면 앞 단계를 따른다 (기능정리 5-3, 5-5) */
-function SearchOrder({
-  title,
-  steps,
-  note,
-}: {
-  title: string;
-  steps: { label: string; detail: string; onClick?: () => void }[];
-  note?: string;
-}) {
+/**
+ * 고객사·스페이스 답장에 함께 쓰는 위 단계 자료(트리에서 물려받는 것). 누르면 그 범위로 간다.
+ * 단계별 순서 설명은 우리 회사에만 한 번 둔다
+ */
+function AlsoUses({ items }: { items: { label: string; onClick: () => void }[] }) {
+  return (
+    <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
+      <span>답장할 때 함께 보는 자료</span>
+      {items.map((it) => (
+        <button
+          key={it.label}
+          type="button"
+          onClick={it.onClick}
+          className="rounded-md bg-slate-100 px-1.5 py-0.5 text-slate-600 hover:bg-brand-50 hover:text-brand-700"
+        >
+          {it.label}
+        </button>
+      ))}
+    </p>
+  );
+}
+
+/** AI가 답장할 때 보는 순서. 앞 단계가 먼저 적용되고, 서로 다르면 앞 단계를 따른다 (기능정리 5-3, 5-5) */
+function SearchOrder({ title, steps, note }: { title: string; steps: { label: string; detail: string }[]; note?: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3">
       <p className="text-xs font-medium text-slate-600">{title}</p>
       <ol className="mt-2 flex flex-wrap items-center gap-1.5">
-        {steps.map((s, i) => {
-          const body = (
-            <>
+        {steps.map((s, i) => (
+          <li key={s.label} className="flex items-center gap-1.5">
+            {i > 0 && <ChevronRight className="size-3.5 text-slate-300" />}
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1 text-xs">
               <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
                 {i + 1}
               </span>
               <span className="font-medium text-slate-700">{s.label}</span>
               <span className="text-slate-400">{s.detail}</span>
-            </>
-          );
-          const chip = "inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1 text-xs";
-          return (
-            <li key={s.label} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronRight className="size-3.5 text-slate-300" />}
-              {s.onClick ? (
-                <button type="button" onClick={s.onClick} className={cn(chip, "hover:bg-brand-50")}>
-                  {body}
-                </button>
-              ) : (
-                <span className={chip}>{body}</span>
-              )}
-            </li>
-          );
-        })}
+            </span>
+          </li>
+        ))}
       </ol>
       {note && <p className="mt-2 text-xs text-slate-500">{note}</p>}
     </div>
