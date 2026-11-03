@@ -44,7 +44,7 @@ import { cn } from "@/lib/cn";
 import { useDemo, visibleThreads } from "@/lib/demo-context";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { HANDOVERS, MEETINGS, MONDAY_SYNCED_AT, PROJECT_FACTS, findStaff } from "@/lib/mock-data";
-import { isMyChat, lastAt, messageTag, roomName } from "@/lib/thread";
+import { isMyChat, lastAt, messageTags, roomName } from "@/lib/thread";
 import type { ChannelId, Contact as ContactPerson, MondayItem, Thread } from "@/lib/types";
 import { ContactDialog } from "./contact-dialog";
 import { DocDraftDialog } from "./doc-draft-dialog";
@@ -119,7 +119,7 @@ export function ProjectDetail({ id }: { id: string }) {
       return { contact: c, channels, latest: withThem[0] };
     });
   // 연결한 채팅방이라도 다른 프로젝트 얘기나 개인 대화로 표시한 메시지는 세지 않는다
-  const messageCount = readable.reduce((sum, t) => sum + t.messages.filter((m) => messageTag(t, m) === id).length, 0);
+  const messageCount = readable.reduce((sum, t) => sum + t.messages.filter((m) => messageTags(t, m).includes(id)).length, 0);
   const facts = PROJECT_FACTS.filter((f) => f.projectId === id);
   const companyDocs = docs.filter((d) => !d.projectId && d.priority);
   const hasTodo = Boolean(brief && (brief.openIssues.length || brief.promises.length));
@@ -387,7 +387,7 @@ export function ProjectDetail({ id }: { id: string }) {
             <Card>
               <CommunicationTimeline threads={readable} projectId={id} />
               <p className="mt-5 text-xs text-slate-400">
-                연결한 채팅방에서 이 프로젝트로 쌓인 메시지만 보여요. 다른 프로젝트 얘기와 개인 대화로 표시한 메시지는 빠져요.
+                연결한 채팅방에서 이 프로젝트로 쌓인 메시지만 보여요. 다른 프로젝트 얘기와 개인 대화로 표시한 메시지는 빠지고, 여러 프로젝트에 함께 쌓인 메시지는 표시가 붙어요.
               </p>
               {hiddenCount > 0 && (
                 <p className="mt-5 flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">

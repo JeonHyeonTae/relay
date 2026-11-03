@@ -57,10 +57,10 @@ interface DemoContextValue {
   /** 활동 기록 (보안 검토용) */
   activity: ActivityEntry[];
   logActivity: (text: string) => void;
-  /** tag: 이 메시지를 쌓을 프로젝트 id, 또는 PERSONAL(개인 대화라 쌓지 않음) */
-  sendReply: (threadId: string, body: string, edited: boolean, tag: string) => void;
+  /** tags: 이 메시지를 쌓을 프로젝트 id들(여러 개 가능), 또는 [PERSONAL](개인 대화라 쌓지 않음) */
+  sendReply: (threadId: string, body: string, edited: boolean, tags: string[]) => void;
   /** 받은 메시지 등 이미 있는 메시지가 쌓일 곳을 바꾼다 */
-  tagMessage: (threadId: string, messageId: string, tag: string) => void;
+  tagMessage: (threadId: string, messageId: string, tags: string[]) => void;
   /** 프로젝트에 채팅방을 연결한다. 한 채팅방을 여러 프로젝트에 연결할 수 있다 */
   linkThreads: (projectId: string, threadIds: string[]) => void;
   unlinkThread: (projectId: string, threadId: string) => void;
@@ -117,7 +117,7 @@ const DEFAULT_TEAM: TeamSettings = {
 function pinTags(t: Thread): Thread {
   const first = t.projectIds[0];
   if (!first) return t;
-  return { ...t, messages: t.messages.map((m) => (m.personal || m.projectId ? m : { ...m, projectId: first })) };
+  return { ...t, messages: t.messages.map((m) => (m.personal || m.projectIds ? m : { ...m, projectIds: [first] })) };
 }
 
 const DemoContext = createContext<DemoContextValue | null>(null);
@@ -174,16 +174,16 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   );
 
   const sendReply = useCallback(
-    (threadId: string, body: string, edited: boolean, tag: string) => {
+    (threadId: string, body: string, edited: boolean, tags: string[]) => {
       const at = nextAt();
-      const personal = tag === PERSONAL;
+      const personal = tags.includes(PERSONAL);
       const message = {
         id: `sent-${sentCount.current}`,
         authorId: currentUser.id,
         authorName: currentUser.name,
         body,
         at,
-        ...(personal ? { personal: true } : { projectId: tag }),
+        ...(personal ? { personal: true } : { projectIds: tags }),
       };
       setThreads((prev) =>
         prev.map((t) =>
@@ -221,7 +221,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     [currentUser, notify, nextAt],
   );
 
-  const tagMessage = useCallback((threadId: string, messageId: string, tag: string) => {
+  const tagMessage = useCallback((threadId: string, messageId: string, tags: string[]) => {
+    const personal = tags.includes(PERSONAL);
     setThreads((prev) =>
       prev.map((t) =>
         t.id === threadId
@@ -229,7 +230,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
               ...t,
               messages: t.messages.map((m) =>
                 m.id === messageId
-                  ? { ...m, personal: tag === PERSONAL || undefined, projectId: tag === PERSONAL ? undefined : tag }
+                  ? { ...m, personal: personal || undefined, projectIds: personal ? undefined : tags }
                   : m,
               ),
             }

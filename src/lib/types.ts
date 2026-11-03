@@ -69,8 +69,11 @@ export interface Message {
   authorName: string;
   body: string;
   at: string;
-  /** 어느 프로젝트 대화로 쌓을지. 보낼 때 고르고, 받은 메시지는 AI가 붙인다. 없으면 채팅방에 처음 연결한 프로젝트 */
-  projectId?: string;
+  /**
+   * 어느 프로젝트 대화로 쌓을지. 한 메시지에 여러 프로젝트 얘기가 섞이면 그 프로젝트 모두에 쌓는다.
+   * 보낼 때 고르고, 받은 메시지는 AI가 붙인다. 없으면 채팅방에 처음 연결한 프로젝트
+   */
+  projectIds?: string[];
   /** 사적인 대화: 프로젝트 소통 내역과 AI 학습에 쓰지 않는다 */
   personal?: boolean;
 }

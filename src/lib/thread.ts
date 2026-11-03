@@ -14,22 +14,30 @@ export function isMyChat(thread: Thread, me: Staff) {
 export const PERSONAL = "personal";
 
 /**
- * 메시지가 쌓이는 곳: 프로젝트 id, 개인 대화(PERSONAL), 아무 데도 안 쌓임(undefined).
- * 표시가 없는 메시지는 채팅방에 처음 연결한 프로젝트로 본다. 연결을 끊은 프로젝트로 표시된 메시지는 쌓지 않는다
+ * 메시지가 쌓이는 곳: 프로젝트 id 여러 개, 개인 대화([PERSONAL]), 아무 데도 안 쌓임([]).
+ * 표시가 없는 메시지는 채팅방에 처음 연결한 프로젝트로 본다. 연결을 끊은 프로젝트에는 쌓지 않는다
  */
-export function messageTag(thread: Thread, m: Message): string | undefined {
-  if (m.personal) return PERSONAL;
-  if (m.projectId) return thread.projectIds.includes(m.projectId) ? m.projectId : undefined;
-  return thread.projectIds[0];
+export function messageTags(thread: Thread, m: Message): string[] {
+  if (m.personal) return [PERSONAL];
+  if (m.projectIds) return m.projectIds.filter((id) => thread.projectIds.includes(id));
+  return thread.projectIds.slice(0, 1);
 }
 
 /** 답장을 쓸 때 처음 골라 둘 곳: 마지막으로 쌓인 메시지와 같은 곳. 연결한 프로젝트가 없으면 개인 대화 */
-export function defaultTag(thread: Thread) {
+export function defaultTags(thread: Thread): string[] {
   for (let i = thread.messages.length - 1; i >= 0; i--) {
-    const tag = messageTag(thread, thread.messages[i]);
-    if (tag) return tag;
+    const tags = messageTags(thread, thread.messages[i]);
+    if (tags.length) return tags;
   }
-  return thread.projectIds[0] ?? PERSONAL;
+  return thread.projectIds.length ? [thread.projectIds[0]] : [PERSONAL];
+}
+
+/** 쌓을 곳 하나를 켜고 끈다. 개인 대화는 프로젝트와 함께 고를 수 없고, 프로젝트는 마지막 하나를 끌 수 없다 */
+export function toggleTag(tags: string[], id: string): string[] {
+  if (id === PERSONAL) return [PERSONAL];
+  const picked = tags.filter((t) => t !== PERSONAL);
+  if (!picked.includes(id)) return [...picked, id];
+  return picked.length > 1 ? picked.filter((t) => t !== id) : picked;
 }
 
 /** 메시지마다 어디에 쌓이는지 보여 줄 방: 여러 프로젝트에 연결했거나 개인 대화가 섞였을 때 */
