@@ -88,7 +88,6 @@ export function ClientList() {
                     <Link href={`/clients/${account.id}`} onClick={(e) => e.stopPropagation()} className="hover:text-brand-600">
                       {account.name}
                     </Link>
-                    {account.partner && <Badge className="ml-1.5 bg-violet-50 text-violet-700">협력사</Badge>}
                   </td>
                   <td className="hidden px-4 py-3 text-slate-500 lg:table-cell">{account.industry}</td>
                   <td className="px-4 py-3">

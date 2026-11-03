@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, FileText, ShieldCheck, Sparkles } from "lucide-react";
+import { Building2, Download, FileText, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,13 @@ import { formatDate } from "@/lib/format";
 import { findStaff } from "@/lib/mock-data";
 
 export function DocPreviewModal({ docId, onClose }: { docId: string | null; onClose: () => void }) {
-  const { docs, projects, role, setDocPriority, notify, logActivity, team } = useDemo();
+  const { docs, projects, accounts, role, setDocPriority, notify, logActivity, team } = useDemo();
   const canDownload = team.downloadScope === "all" || role === "lead";
   const doc = docs.find((d) => d.id === docId);
   if (!doc) return null;
 
   const project = projects.find((p) => p.id === doc.projectId);
+  const account = accounts.find((a) => a.id === doc.accountId);
 
   return (
     <Modal
@@ -58,6 +59,14 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
             </Link>
           </>
         )}
+        {account && (
+          <>
+            <span>·</span>
+            <Link href={`/knowledge?account=${account.id}`} className="text-brand-600 hover:underline" onClick={onClose}>
+              {account.name} 공통 자료
+            </Link>
+          </>
+        )}
       </div>
 
       <div className="space-y-2 rounded-xl bg-brand-50/60 p-4">
@@ -85,8 +94,18 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
         AI 답장의 근거로 <strong className="font-semibold text-slate-700">{doc.usedCount}회</strong> 쓰였어요.
       </p>
 
+      {account && (
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm">
+          <Building2 className="size-4 shrink-0 text-brand-600" />
+          <p className="min-w-0 flex-1">
+            <span className="font-medium">{account.name} 공통 자료예요</span>
+            <span className="block text-xs text-slate-500">{account.name}의 모든 프로젝트 답장에 참고해요. 다른 회사 답장에는 쓰지 않아요.</span>
+          </p>
+        </div>
+      )}
+
       {/* 회사 공통 자료만 회사 기준이 될 수 있다. 모든 답장에 영향을 주니 팀장만 바꾼다 */}
-      {!doc.projectId && (
+      {!doc.projectId && !doc.accountId && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
           <ShieldCheck className="size-4 shrink-0 text-brand-600" />
           <div className="min-w-0 flex-1 text-sm">

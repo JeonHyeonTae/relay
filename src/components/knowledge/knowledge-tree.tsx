@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ChevronRight, FolderKanban, Handshake, type LucideIcon } from "lucide-react";
+import { Building2, ChevronRight, FolderKanban, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { useDemo } from "@/lib/demo-context";
@@ -12,7 +12,7 @@ export type Scope = { kind: "company" } | { kind: "account"; id: string } | { ki
 const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대기: 1, 완료: 2 };
 
 /**
- * 왼쪽 트리: 우리 회사(공통) → 고객사·협력사 → 회사 → 프로젝트.
+ * 왼쪽 트리: 우리 회사(공통) → 고객사 → 프로젝트.
  * 진행 중인 프로젝트가 없는 회사는 접어 둔다
  */
 export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (scope: Scope) => void }) {
@@ -31,10 +31,6 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
     onSelect(next);
   };
 
-  const groups = [
-    { label: "고객사", icon: Building2, items: accounts.filter((a) => !a.partner) },
-    { label: "협력사", icon: Handshake, items: accounts.filter((a) => a.partner) },
-  ];
 
   return (
     <nav aria-label="지식 구조" className="rounded-xl border border-slate-200 bg-white p-2 text-sm">
@@ -42,62 +38,57 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
         icon={Building2}
         label="우리 회사"
         hint="공통"
-        count={docs.filter((d) => !d.projectId).length}
+        count={docs.filter((d) => !d.projectId && !d.accountId).length}
         active={scope.kind === "company"}
         onClick={() => select({ kind: "company" })}
       />
-      {groups.map(
-        (g) =>
-          g.items.length > 0 && (
-            <div key={g.label} className="mt-3">
-              <p className="flex items-center gap-1.5 px-2 pb-1 text-xs font-medium text-slate-400">
-                <g.icon className="size-3.5" />
-                {g.label} {g.items.length}
-              </p>
-              {g.items.map((a) => {
-                const list = projectsOf(a.id);
-                const open = !collapsed.includes(a.id);
-                return (
-                  <div key={a.id}>
-                    <div className="flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggle(a.id)}
-                        aria-expanded={open}
-                        aria-label={`${a.name} ${open ? "접기" : "펴기"}`}
-                        className="flex size-6 shrink-0 items-center justify-center rounded text-slate-400 hover:bg-slate-100"
-                      >
-                        <ChevronRight className={cn("size-3.5 transition-transform", open && "rotate-90")} />
-                      </button>
+      <div className="mt-3">
+        <p className="flex items-center gap-1.5 px-2 pb-1 text-xs font-medium text-slate-400">
+          <Building2 className="size-3.5" />
+          고객사 {accounts.length}
+        </p>
+        {accounts.map((a) => {
+          const list = projectsOf(a.id);
+          const open = !collapsed.includes(a.id);
+          return (
+            <div key={a.id}>
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => toggle(a.id)}
+                  aria-expanded={open}
+                  aria-label={`${a.name} ${open ? "접기" : "펴기"}`}
+                  className="flex size-6 shrink-0 items-center justify-center rounded text-slate-400 hover:bg-slate-100"
+                >
+                  <ChevronRight className={cn("size-3.5 transition-transform", open && "rotate-90")} />
+                </button>
+                <Row
+                  label={a.name}
+                  count={docs.filter((d) => d.accountId === a.id || list.some((p) => p.id === d.projectId)).length}
+                  active={scope.kind === "account" && scope.id === a.id}
+                  onClick={() => select({ kind: "account", id: a.id })}
+                />
+              </div>
+              {open && (
+                <ul className="mb-1 ml-3 border-l border-slate-100 pl-2">
+                  {list.map((p) => (
+                    <li key={p.id}>
                       <Row
-                        label={a.name}
-                        count={list.length}
-                        active={scope.kind === "account" && scope.id === a.id}
-                        onClick={() => select({ kind: "account", id: a.id })}
+                        icon={FolderKanban}
+                        label={p.name}
+                        muted={p.status === "완료"}
+                        count={docs.filter((d) => d.projectId === p.id).length}
+                        active={scope.kind === "project" && scope.id === p.id}
+                        onClick={() => select({ kind: "project", id: p.id })}
                       />
-                    </div>
-                    {open && (
-                      <ul className="mb-1 ml-3 border-l border-slate-100 pl-2">
-                        {list.map((p) => (
-                          <li key={p.id}>
-                            <Row
-                              icon={FolderKanban}
-                              label={p.name}
-                              muted={p.status === "완료"}
-                              count={docs.filter((d) => d.projectId === p.id).length}
-                              active={scope.kind === "project" && scope.id === p.id}
-                              onClick={() => select({ kind: "project", id: p.id })}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-          ),
-      )}
+          );
+        })}
+      </div>
     </nav>
   );
 }

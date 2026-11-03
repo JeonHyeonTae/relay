@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowLeft, ChevronRight, Contact, FileText, Plus, Users } from "lucide-react";
+import { ArrowLeft, Building2, ChevronRight, Contact, FileText, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { BackToConversation } from "@/components/common/back-to-conversation";
 import { ChannelBadge } from "@/components/common/channel-badge";
 import { ProjectStatusBadge } from "@/components/common/project-status-badge";
+import { DocPreviewModal } from "@/components/docs/doc-preview-modal";
 import { DueLabel, StageBadge, mondayOf, nextDue } from "@/components/projects/monday";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -21,12 +22,15 @@ const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대�
 export function ClientDetail({ id }: { id: string }) {
   const { accounts, projects, docs } = useDemo();
   const [creating, setCreating] = useState(false);
+  const [openDocId, setOpenDocId] = useState<string | null>(null);
 
   const account = accounts.find((a) => a.id === id);
   if (!account) {
     return <p className="p-8 text-sm text-slate-500">고객사를 찾을 수 없어요.</p>;
   }
 
+  // 이 회사 모든 프로젝트 답장에 참고하는 자료
+  const commonDocs = docs.filter((d) => d.accountId === id);
   // 진행 중인 프로젝트가 위로
   const accountProjects = projects
     .filter((p) => p.accountId === id)
@@ -42,7 +46,6 @@ export function ClientDetail({ id }: { id: string }) {
 
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold">{account.name}</h1>
-        {account.partner && <Badge className="bg-violet-50 text-violet-700">협력사</Badge>}
         <Badge>{account.industry}</Badge>
         <Button variant="primary" className="ml-auto" onClick={() => setCreating(true)}>
           <Plus className="size-4" />새 프로젝트
@@ -95,21 +98,51 @@ export function ClientDetail({ id }: { id: string }) {
           </ul>
         </section>
 
-        <Card title="연락처" icon={<Contact className="size-4 text-slate-500" />}>
-          <ul className="space-y-3">
-            {account.contacts.map((c) => (
-              <li key={c.name}>
-                <p className="text-sm font-medium">
-                  {c.name} {c.title}
-                </p>
-                <p className="text-xs text-slate-500">{c.role}</p>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <div className="space-y-5">
+          <Card title="연락처" icon={<Contact className="size-4 text-slate-500" />}>
+            <ul className="space-y-3">
+              {account.contacts.map((c) => (
+                <li key={c.name}>
+                  <p className="text-sm font-medium">
+                    {c.name} {c.title}
+                  </p>
+                  <p className="text-xs text-slate-500">{c.role}</p>
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card
+            title={`공통 자료 ${commonDocs.length}`}
+            icon={<Building2 className="size-4 text-slate-500" />}
+            action={
+              <Link href={`/knowledge?account=${id}`} className="text-xs font-normal text-brand-600 hover:underline">
+                지식 베이스에서 관리
+              </Link>
+            }
+          >
+            <p className="mb-3 text-xs text-slate-500">이 회사 모든 프로젝트 답장에 참고하는 자료예요.</p>
+            {commonDocs.length > 0 && (
+              <ul className="space-y-2">
+                {commonDocs.map((d) => (
+                  <li key={d.id}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDocId(d.id)}
+                      className="flex items-center gap-2 text-left text-sm hover:text-brand-600"
+                    >
+                      <FileText className="size-4 shrink-0 text-slate-400" />
+                      {d.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
       </div>
 
       <NewProjectDialog key={id} open={creating} onClose={() => setCreating(false)} accountId={id} />
+      <DocPreviewModal docId={openDocId} onClose={() => setOpenDocId(null)} />
     </div>
   );
 }

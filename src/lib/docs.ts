@@ -12,12 +12,16 @@ export function isStale(doc: KnowledgeDoc, staleMonths = STALE_DAYS / 30) {
 
 /**
  * AI가 답장할 때 자료를 보는 순서 (기능정리 5-5).
- * standard: 회사 기준(모든 답장에 먼저), company: 회사 자료(맞을 때만), project: 그 프로젝트 자료
+ * standard: 회사 기준(모든 답장에 먼저), company: 회사 자료(맞을 때만),
+ * account: 고객사 공통 자료(그 회사 프로젝트 답장에만), project: 그 프로젝트 자료
  */
-export type DocLayer = "standard" | "company" | "project";
+export type DocLayer = "standard" | "company" | "account" | "project";
+
+export const LAYER_ORDER: Record<DocLayer, number> = { standard: 0, company: 1, account: 2, project: 3 };
 
 export function docLayer(doc: KnowledgeDoc): DocLayer {
   if (doc.projectId) return "project";
+  if (doc.accountId) return "account";
   return doc.priority ? "standard" : "company";
 }
 
@@ -30,7 +34,7 @@ export function downloadNotice(doc: KnowledgeDoc) {
   return `데모에는 원본 파일이 없어요. 실제로는 '${doc.title}' 원본을 내려받아요.`;
 }
 
-/** 프로젝트 문서는 프로젝트 화면에서, 회사 공통 문서는 지식 베이스에서 연다 */
+/** 프로젝트 문서는 프로젝트 화면에서, 회사 공통·고객사 공통 문서는 지식 베이스에서 연다 */
 export function docHref(doc: KnowledgeDoc) {
   return doc.projectId ? `/projects/${doc.projectId}?doc=${doc.id}` : `/knowledge?doc=${doc.id}`;
 }

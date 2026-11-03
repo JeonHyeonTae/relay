@@ -5,6 +5,7 @@ import {
   ArrowRightLeft,
   ArrowUpRight,
   BookOpen,
+  Building2,
   ChevronRight,
   ClipboardList,
   Contact,
@@ -42,6 +43,7 @@ import { Card } from "@/components/ui/card";
 import { ColumnPicker, useStoredColumns } from "@/components/ui/column-picker";
 import { cn } from "@/lib/cn";
 import { useDemo, visibleThreads } from "@/lib/demo-context";
+import { docLayer } from "@/lib/docs";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { HANDOVERS, MEETINGS, MONDAY_SYNCED_AT, PROJECT_FACTS, findStaff } from "@/lib/mock-data";
 import { isMyChat, lastAt, messageTags, roomName } from "@/lib/thread";
@@ -121,7 +123,8 @@ export function ProjectDetail({ id }: { id: string }) {
   // 연결한 채팅방이라도 다른 프로젝트 얘기나 개인 대화로 표시한 메시지는 세지 않는다
   const messageCount = readable.reduce((sum, t) => sum + t.messages.filter((m) => messageTags(t, m).includes(id)).length, 0);
   const facts = PROJECT_FACTS.filter((f) => f.projectId === id);
-  const companyDocs = docs.filter((d) => !d.projectId && d.priority);
+  const companyDocs = docs.filter((d) => docLayer(d) === "standard");
+  const commonDocs = docs.filter((d) => d.accountId === project?.accountId);
   const hasTodo = Boolean(brief && (brief.openIssues.length || brief.promises.length));
   const monday = mondayOf(id);
   const meetingCount = MEETINGS.filter((m) => m.projectId === id).length;
@@ -532,6 +535,34 @@ export function ProjectDetail({ id }: { id: string }) {
               ))}
             </ul>
           </SideSection>
+
+          {commonDocs.length > 0 && account && (
+            <SideSection
+              title={`${account.name} 공통 자료`}
+              icon={<Building2 className="size-3.5" />}
+              action={
+                <Link href={`/knowledge?account=${account.id}`} className="text-xs text-brand-600 hover:underline">
+                  지식 베이스에서 관리
+                </Link>
+              }
+            >
+              <p className="-mt-1 mb-3 text-xs text-slate-500">이 회사 모든 프로젝트 답장에 함께 참고하는 자료예요.</p>
+              <ul className="space-y-2">
+                {commonDocs.map((d) => (
+                  <li key={d.id}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDocId(d.id)}
+                      className="flex items-center gap-2 text-left text-sm hover:text-brand-600"
+                    >
+                      <FileText className="size-4 shrink-0 text-slate-400" />
+                      {d.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </SideSection>
+          )}
         </aside>
       </div>
 

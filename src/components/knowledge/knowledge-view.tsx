@@ -11,20 +11,25 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { cn } from "@/lib/cn";
 import { useDemo } from "@/lib/demo-context";
-import { docLayer, isStale, type DocLayer } from "@/lib/docs";
+import { LAYER_ORDER, docLayer, isStale } from "@/lib/docs";
 import { KnowledgeTree, type Scope } from "./knowledge-tree";
 import { AccountPanel, CompanyPanel, ProjectPanel } from "./scope-panels";
 
-const LAYER_ORDER: Record<DocLayer, number> = { standard: 0, company: 1, project: 2 };
-
 /**
- * 지식 베이스: AI가 답장할 때 참고하는 자료를 우리 회사 → 고객사·협력사 → 회사 → 프로젝트 구조로 정리해 보는 곳.
+ * 지식 베이스: AI가 답장할 때 참고하는 자료를 우리 회사 → 고객사 → 프로젝트 구조로 정리해 보는 곳.
  * 이 구조가 곧 AI가 자료를 찾는 범위다. 자료가 틀리면 AI 답장도 틀린다
  */
 export function KnowledgeView() {
   const { docs, team } = useDemo();
   const searchParams = useSearchParams();
-  const [scope, setScope] = useState<Scope>({ kind: "company" });
+  // 다른 화면에서 ?account=, ?project= 로 그 범위를 바로 연다
+  const [scope, setScope] = useState<Scope>(() => {
+    const account = searchParams.get("account");
+    const project = searchParams.get("project");
+    if (project) return { kind: "project", id: project };
+    if (account) return { kind: "account", id: account };
+    return { kind: "company" };
+  });
   const [range, setRange] = useState("6");
   const [uploading, setUploading] = useState(false);
   const [openDocId, setOpenDocId] = useState<string | null>(searchParams.get("doc"));
@@ -118,12 +123,13 @@ export function KnowledgeView() {
         </div>
       </div>
 
-      {/* 프로젝트를 보고 있으면 그 프로젝트 자료로 올린다 */}
+      {/* 프로젝트를 보고 있으면 그 프로젝트 자료로, 회사를 보고 있으면 그 회사 공통 자료로 올린다 */}
       <UploadDialog
-        key={scope.kind === "project" ? scope.id : "company"}
+        key={scope.kind === "company" ? "company" : scope.id}
         open={uploading}
         onClose={() => setUploading(false)}
         projectId={scope.kind === "project" ? scope.id : undefined}
+        defaultAccountId={scope.kind === "account" ? scope.id : undefined}
       />
       <DocPreviewModal docId={openDocId} onClose={() => setOpenDocId(null)} />
     </div>

@@ -2,6 +2,7 @@
 
 import {
   BookOpen,
+  Building2,
   ChevronRight,
   ExternalLink,
   FolderKanban,
@@ -48,21 +49,23 @@ export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: Pane
   const canOpen = (threadId?: string) => Boolean(threadId && readable.some((t) => t.id === threadId));
   const standard = docs.filter((d) => docLayer(d) === "standard").sort(recent);
   const company = docs.filter((d) => docLayer(d) === "company").sort(recent);
+  const accountDocs = docs.filter((d) => docLayer(d) === "account").length;
   // 대화는 프로젝트에 연결한 채팅방만 쌓인다
   const linkedChats = readable.filter((t) => t.projectIds.length > 0).length;
 
   return (
     <div className="space-y-6">
-      <ScopeHeader crumbs={[]} title="우리 회사" sub="모든 고객사·협력사 답장에 공통으로 쓰는 자료와 지식이에요." />
+      <ScopeHeader crumbs={[]} title="우리 회사" sub="모든 고객사 답장에 공통으로 쓰는 자료와 지식이에요." />
       <SearchOrder
         title="AI가 답장할 때 보는 순서"
         steps={[
           { label: "회사 기준", detail: `${standard.length}개` },
           { label: "회사 자료", detail: `${company.length}개` },
+          { label: "고객사 공통 자료", detail: `${accountDocs}개 · 그 회사에만` },
           { label: "프로젝트 자료", detail: `${docs.filter((d) => d.projectId).length}개 · 그 프로젝트에만` },
           { label: "프로젝트 대화", detail: `채팅방 ${linkedChats} · ${rangeLabel(range)}` },
         ]}
-        note="앞 단계가 먼저 적용되고, 내용이 서로 다르면 앞 단계를 따라요. 프로젝트 자료와 대화는 왼쪽에서 회사·프로젝트를 골라 봐요."
+        note="앞 단계가 먼저 적용되고, 내용이 서로 다르면 앞 단계를 따라요. 고객사 공통 자료, 프로젝트 자료와 대화는 왼쪽에서 회사·프로젝트를 골라 봐요."
       />
       <Section icon={ShieldCheck} title="회사 기준" count={standard.length} desc="말투, 응대 원칙, 단가처럼 모든 답장이 지켜야 하는 자료예요. 팀장이 정해요.">
         <DocTable docs={standard} onOpen={onOpenDoc} />
@@ -121,31 +124,53 @@ export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: Pane
   );
 }
 
-/** 고객사·협력사: 그 회사 프로젝트들과, 프로젝트별로 쌓인 자료를 한 번에 */
+/** 고객사: 그 회사 모든 프로젝트에 쓰는 공통 자료, 프로젝트들, 프로젝트별로 쌓인 자료 */
 export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "range"> & { id: string }) {
   const { docs, threads, projects, accounts, currentUser, role } = useDemo();
   const account = accounts.find((a) => a.id === id);
   if (!account) return null;
   const readable = visibleThreads(threads, currentUser, role);
   const list = projects.filter((p) => p.accountId === id).sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
-  const accountDocs = docs.filter((d) => list.some((p) => p.id === d.projectId)).sort(recent);
+  const common = docs.filter((d) => d.accountId === id).sort(recent);
+  const projectDocs = docs.filter((d) => list.some((p) => p.id === d.projectId)).sort(recent);
+  const toCompany = () => onSelect({ kind: "company" });
 
   return (
     <div className="space-y-6">
       <ScopeHeader
-        crumbs={[{ label: "우리 회사", onClick: () => onSelect({ kind: "company" }) }, { label: account.partner ? "협력사" : "고객사" }]}
+        crumbs={[{ label: "우리 회사", onClick: toCompany }, { label: "고객사" }]}
         title={account.name}
         badges={<Badge>{account.industry}</Badge>}
         action={
           <Link href={`/clients/${account.id}`} className="inline-flex items-center gap-1 text-xs text-brand-600 hover:underline">
-            {account.partner ? "협력사" : "고객사"} 화면
+            고객사 화면
             <ExternalLink className="size-3" />
           </Link>
         }
       />
-      <p className="rounded-xl bg-slate-50 px-3 py-2.5 text-xs leading-relaxed text-slate-600">
-        이 회사 프로젝트에 답할 때 AI는 회사 기준·회사 자료와 <b className="font-medium text-slate-800">답하는 그 프로젝트</b>의 자료·대화를 찾아봐요. 같은 회사라도 다른 프로젝트 자료는 섞지 않아요.
-      </p>
+      <SearchOrder
+        title={`${account.name} 프로젝트 답장에 AI가 찾아보는 순서`}
+        steps={[
+          { label: "회사 기준", detail: `${docs.filter((d) => docLayer(d) === "standard").length}개`, onClick: toCompany },
+          { label: "회사 자료", detail: `${docs.filter((d) => docLayer(d) === "company").length}개`, onClick: toCompany },
+          { label: "이 회사 공통 자료", detail: `${common.length}개` },
+          { label: "그 프로젝트 자료", detail: "답하는 프로젝트만" },
+          { label: "그 프로젝트 대화", detail: "답하는 프로젝트만" },
+        ]}
+        note="같은 회사라도 다른 프로젝트 자료는 섞지 않아요. 여러 프로젝트에 반복해 쓰는 자료는 공통 자료로 올려요."
+      />
+      <Section
+        icon={Building2}
+        title="공통 자료"
+        count={common.length}
+        desc="계약 조건, 출입 수칙, 보안 요구사항처럼 이 회사 모든 프로젝트 답장에 참고하는 자료예요."
+      >
+        {common.length === 0 ? (
+          <Empty>아직 없어요. 위쪽 자료 올리기에서 &ldquo;고객사 공통 자료&rdquo;로 올려요.</Empty>
+        ) : (
+          <DocTable docs={common} onOpen={onOpenDoc} />
+        )}
+      </Section>
       <Section icon={FolderKanban} title="프로젝트" count={list.length}>
         {list.length === 0 ? (
           <Empty>아직 프로젝트가 없어요.</Empty>
@@ -177,8 +202,8 @@ export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "rang
           </div>
         )}
       </Section>
-      <Section icon={BookOpen} title="이 회사 자료 모아 보기" count={accountDocs.length} desc="프로젝트마다 쌓인 자료를 한 번에 봐요.">
-        <DocTable docs={accountDocs} onOpen={onOpenDoc} showProject />
+      <Section icon={BookOpen} title="프로젝트 자료 모아 보기" count={projectDocs.length} desc="프로젝트마다 쌓인 자료를 한 번에 봐요.">
+        <DocTable docs={projectDocs} onOpen={onOpenDoc} showProject />
       </Section>
     </div>
   );
@@ -205,7 +230,7 @@ export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { 
       <ScopeHeader
         crumbs={[
           { label: "우리 회사", onClick: toCompany },
-          { label: account.partner ? "협력사" : "고객사" },
+          { label: "고객사" },
           { label: account.name, onClick: () => onSelect({ kind: "account", id: account.id }) },
         ]}
         title={project.name}
@@ -222,6 +247,11 @@ export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { 
         steps={[
           { label: "회사 기준", detail: `${docs.filter((d) => docLayer(d) === "standard").length}개`, onClick: toCompany },
           { label: "회사 자료", detail: `${docs.filter((d) => docLayer(d) === "company").length}개`, onClick: toCompany },
+          {
+            label: `${account.name} 공통 자료`,
+            detail: `${docs.filter((d) => d.accountId === account.id).length}개`,
+            onClick: () => onSelect({ kind: "account", id: account.id }),
+          },
           { label: "이 프로젝트 자료", detail: `${projectDocs.length}개` },
           { label: "이 프로젝트 대화", detail: `채팅방 ${rooms.length} · ${rangeLabel(range)}` },
         ]}

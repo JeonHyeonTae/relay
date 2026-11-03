@@ -14,12 +14,12 @@ import type { KnowledgeDoc } from "@/lib/types";
 interface DocTableProps {
   docs: KnowledgeDoc[];
   onOpen: (docId: string) => void;
-  /** 지식 베이스처럼 여러 프로젝트 문서가 섞일 때 프로젝트 이름을 함께 보여준다 */
+  /** 지식 베이스처럼 여러 프로젝트 문서가 섞일 때 프로젝트 이름(고객사 공통 자료는 회사 이름)을 함께 보여준다 */
   showProject?: boolean;
 }
 
 export function DocTable({ docs, onOpen, showProject }: DocTableProps) {
-  const { projects, notify, logActivity, team, role } = useDemo();
+  const { projects, accounts, notify, logActivity, team, role } = useDemo();
   // 팀 설정에서 원본 내려받기를 팀장만으로 막았으면 팀원은 못 받는다
   const canDownload = team.downloadScope === "all" || role === "lead";
   const [requested, setRequested] = useState<string[]>([]);
@@ -45,6 +45,7 @@ export function DocTable({ docs, onOpen, showProject }: DocTableProps) {
             const stale = isStale(doc, team.staleMonths);
             const owner = findStaff(doc.ownerId);
             const project = projects.find((p) => p.id === doc.projectId);
+            const account = accounts.find((a) => a.id === doc.accountId);
             return (
               <tr
                 key={doc.id}
@@ -76,6 +77,7 @@ export function DocTable({ docs, onOpen, showProject }: DocTableProps) {
                       <span className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-slate-400">
                         {owner.name}
                         {showProject && project && ` · ${project.name}`}
+                        {showProject && account && ` · ${account.name} 공통`}
                         <span className="xl:hidden">· {sourceLabel(doc.source)}</span>
                         {doc.priority && <Badge className="bg-brand-50 text-brand-700">회사 기준</Badge>}
                       </span>

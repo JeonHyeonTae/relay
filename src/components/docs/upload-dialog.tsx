@@ -17,6 +17,7 @@ const KINDS: DocKind[] = ["제안서", "견적서", "계약서", "회의록", "�
 const USES: { value: DocLayer; title: string; desc: string }[] = [
   { value: "standard", title: "회사 기준", desc: "모든 답장에 먼저 적용" },
   { value: "company", title: "회사 자료", desc: "질문에 맞을 때 참고" },
+  { value: "account", title: "고객사 공통 자료", desc: "그 회사 프로젝트 답장에만" },
   { value: "project", title: "프로젝트 자료", desc: "그 프로젝트 답장에만" },
 ];
 
@@ -25,13 +26,16 @@ interface UploadDialogProps {
   onClose: () => void;
   /** 프로젝트 화면에서 열면 그 프로젝트 자료로 고정 */
   projectId?: string;
+  /** 지식 베이스에서 회사를 보고 있으면 그 회사 공통 자료로 시작 */
+  defaultAccountId?: string;
 }
 
-export function UploadDialog({ open, onClose, projectId }: UploadDialogProps) {
-  const { projects, currentUser, role, addDoc, notify } = useDemo();
+export function UploadDialog({ open, onClose, projectId, defaultAccountId }: UploadDialogProps) {
+  const { projects, accounts, currentUser, role, addDoc, notify } = useDemo();
   const [fileName, setFileName] = useState<string | null>(null);
-  const [use, setUse] = useState<DocLayer>(projectId ? "project" : "company");
-  const [category, setCategory] = useState<Exclude<KnowledgeCategory, "프로젝트">>("문서");
+  const [use, setUse] = useState<DocLayer>(projectId ? "project" : defaultAccountId ? "account" : "company");
+  const [category, setCategory] = useState<Exclude<KnowledgeCategory, "프로젝트" | "고객사">>("문서");
+  const [selectedAccount, setSelectedAccount] = useState(defaultAccountId ?? accounts[0].id);
   const [kind, setKind] = useState<DocKind>("기타");
   const [selectedProject, setSelectedProject] = useState(projectId ?? projects[0].id);
   // 회사 기준은 모든 답장에 영향을 주니 팀장만 정한다
@@ -42,9 +46,10 @@ export function UploadDialog({ open, onClose, projectId }: UploadDialogProps) {
     const title = fileName.replace(/\.[^.]+$/, "");
     addDoc({
       title,
-      category: use === "project" ? "프로젝트" : category,
+      category: use === "project" ? "프로젝트" : use === "account" ? "고객사" : category,
       kind,
       source: "upload",
+      accountId: use === "account" ? selectedAccount : undefined,
       projectId: use === "project" ? selectedProject : undefined,
       updatedAt: DEMO_NOW.slice(0, 10),
       ownerId: currentUser.id,
@@ -77,7 +82,7 @@ export function UploadDialog({ open, onClose, projectId }: UploadDialogProps) {
       {!projectId && (
         <div className="space-y-1.5">
           <p className="text-sm font-medium text-slate-700">AI가 이 자료를 언제 참고하나요?</p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {USES.map((u) => {
               const locked = u.value === "standard" && !canSetStandard;
               return (
@@ -113,11 +118,21 @@ export function UploadDialog({ open, onClose, projectId }: UploadDialogProps) {
               </select>
             </Field>
           )
+        ) : use === "account" ? (
+          <Field label="회사">
+            <select value={selectedAccount} onChange={(e) => setSelectedAccount(e.target.value)} className={inputClass}>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </Field>
         ) : (
           <Field label="분류">
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value as Exclude<KnowledgeCategory, "프로젝트">)}
+              onChange={(e) => setCategory(e.target.value as Exclude<KnowledgeCategory, "프로젝트" | "고객사">)}
               className={inputClass}
             >
               <option value="문서">문서</option>

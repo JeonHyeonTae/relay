@@ -50,8 +50,6 @@ export interface Account {
   name: string;
   industry: string;
   contacts: Contact[];
-  /** 협력사(리셀러·파트너 등). 없으면 고객사. 지식 베이스에서 고객사와 나눠 보여 준다 */
-  partner?: boolean;
 }
 
 export interface Project {
@@ -163,7 +161,7 @@ export interface HandoverBrief {
   promises: string[];
 }
 
-export type KnowledgeCategory = "문서" | "영업" | "회사 지식" | "프로젝트";
+export type KnowledgeCategory = "문서" | "영업" | "회사 지식" | "고객사" | "프로젝트";
 
 export type DocKind = "제안서" | "견적서" | "계약서" | "회의록" | "사양서" | "보고서" | "매뉴얼" | "소개서" | "기타";
 
@@ -176,6 +174,8 @@ export interface KnowledgeDoc {
   category: KnowledgeCategory;
   kind: DocKind;
   source: DocSource;
+  /** 고객사 공통 자료: 그 고객사 모든 프로젝트 답장에 참고. 계약 조건, 출입 수칙, 보안 요구사항 등 */
+  accountId?: string;
   projectId?: string;
   updatedAt: string;
   ownerId: string;
