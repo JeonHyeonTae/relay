@@ -4,7 +4,7 @@ import { daysUntil, formatDate } from "@/lib/format";
 import { MONDAY_ITEMS } from "@/lib/mock-data";
 import type { MondayColor, MondayItem, MondayTask } from "@/lib/types";
 
-/** 프로젝트와 연결된 먼데이 아이템. 연결이 없으면 undefined */
+/** 스페이스와 연결된 먼데이 아이템. 연결이 없으면 undefined */
 export function mondayOf(projectId: string) {
   return MONDAY_ITEMS.find((m) => m.projectId === projectId);
 }

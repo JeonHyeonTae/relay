@@ -17,7 +17,7 @@ import { isMyChat, lastAt, lastMessage, roomName } from "@/lib/thread";
 const DUE_WITHIN_DAYS = 7;
 
 /**
- * 오늘 할 일: 수신함·프로젝트·먼데이에 흩어진 "나에게 걸린 일"을 한 화면에 모은다.
+ * 오늘 할 일: 수신함·스페이스·먼데이에 흩어진 "나에게 걸린 일"을 한 화면에 모은다.
  * 로그인하면 처음 보는 화면 (기능정리 2-1 답장 필요 건 정리, 1-9 개인 투두·미답변 관리)
  */
 export function TodayView() {
@@ -35,7 +35,7 @@ export function TodayView() {
     .filter(({ task }) => task.ownerId === me.id && task.status !== "완료" && task.due && daysUntil(task.due) <= DUE_WITHIN_DAYS)
     .sort((a, b) => (a.task.due ?? "").localeCompare(b.task.due ?? ""));
 
-  // 내가 참여한 프로젝트에서 고객에게 한 약속
+  // 내가 참여한 스페이스에서 고객에게 한 약속
   const promises = projects
     .filter((p) => p.memberIds.includes(me.id) && p.status !== "완료")
     .flatMap((p) => (HANDOVERS.find((h) => h.projectId === p.id)?.promises ?? []).map((text) => ({ text, project: p })));
@@ -52,7 +52,7 @@ export function TodayView() {
       <div>
         <h1 className="text-xl font-semibold">오늘 할 일</h1>
         <p className="mt-1 text-sm text-slate-500">
-          {formatDay(DEMO_NOW)} · {me.name}님에게 걸린 일을 수신함·프로젝트·먼데이에서 모았어요.
+          {formatDay(DEMO_NOW)} · {me.name}님에게 걸린 일을 수신함·스페이스·먼데이에서 모았어요.
         </p>
       </div>
 
@@ -85,7 +85,7 @@ export function TodayView() {
                             </p>
                             <p className="truncate text-sm text-slate-500">{last?.body}</p>
                             <p className="truncate text-xs text-slate-400">
-                              {t.projectIds.map(projectName).join(" · ") || "연결한 프로젝트 없음"}
+                              {t.projectIds.map(projectName).join(" · ") || "연결한 스페이스 없음"}
                             </p>
                           </div>
                           <div className="flex shrink-0 flex-col items-end gap-1">
@@ -116,7 +116,7 @@ export function TodayView() {
                   {deadlines.map(({ task, project }) => (
                     <li key={`${project.id}-${task.name}`}>
                       <Link
-                        href={`/projects/${project.id}?tab=tasks`}
+                        href={`/spaces/${project.id}?tab=tasks`}
                         className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 hover:bg-slate-50"
                       >
                         <TaskStatus status={task.status} />
@@ -144,7 +144,7 @@ export function TodayView() {
                   {promises.map(({ text, project }) => (
                     <li key={text}>
                       <p className="text-sm text-slate-700">{text}</p>
-                      <Link href={`/projects/${project.id}`} className="text-xs text-brand-600 hover:underline">
+                      <Link href={`/spaces/${project.id}`} className="text-xs text-brand-600 hover:underline">
                         {project.name}
                       </Link>
                     </li>

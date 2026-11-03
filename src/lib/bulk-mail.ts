@@ -9,9 +9,9 @@ interface Scenario {
   rule: string;
   subject: string;
   body: string;
-  /** 이 상황에 해당하는 프로젝트 (없으면 대상이 아님) */
+  /** 이 상황에 해당하는 스페이스 (없으면 대상이 아님) */
   match: (projects: Project[]) => Project | undefined;
-  /** 회사마다 덧붙이는 한 줄. AI가 프로젝트와 먼데이 정보로 맞춰 쓴 것으로 본다 */
+  /** 회사마다 덧붙이는 한 줄. AI가 스페이스와 먼데이 정보로 맞춰 쓴 것으로 본다 */
   personalLine: (project: Project, monday?: MondayItem) => string | null;
 }
 
@@ -26,7 +26,7 @@ export const SCENARIOS: Scenario[] = [
   {
     key: "notice",
     title: "공지",
-    rule: "진행 중이거나 대기 중인 프로젝트가 있는 고객사",
+    rule: "진행 중이거나 대기 중인 스페이스가 있는 고객사",
     subject: "[안내] 2027년 장비 표준 단가 변경",
     body: "{이름}님, 안녕하세요.\n2027년 1월 1일부터 장비 표준 단가가 바뀌어 미리 안내드립니다.\n바뀐 단가표는 첨부해 드렸습니다.\n감사합니다.",
     match: (projects) => projects.find(active),
@@ -35,9 +35,9 @@ export const SCENARIOS: Scenario[] = [
   {
     key: "maintenance",
     title: "정기 일정 잡기",
-    rule: "유지보수·정기점검 프로젝트가 진행 중인 고객사",
+    rule: "유지보수·정기점검 스페이스가 진행 중인 고객사",
     subject: "[요청] 11월 정기점검 날짜 확인",
-    body: "{이름}님, 안녕하세요.\n{프로젝트} 11월 점검 날짜를 정하려고 합니다.\n11/10~11/21 중 편하신 날짜 두 개를 알려 주세요.\n감사합니다.",
+    body: "{이름}님, 안녕하세요.\n{스페이스} 11월 점검 날짜를 정하려고 합니다.\n11/10~11/21 중 편하신 날짜 두 개를 알려 주세요.\n감사합니다.",
     match: (projects) => projects.find((p) => active(p) && /유지보수|점검/.test(p.name)),
     personalLine: (project, monday) => {
       const next = monday?.tasks.filter((t) => t.status !== "완료").sort((a, b) => (a.due ?? "").localeCompare(b.due ?? ""))[0];
@@ -47,9 +47,9 @@ export const SCENARIOS: Scenario[] = [
   {
     key: "renewal",
     title: "계약 갱신 안내",
-    rule: "계약·갱신 프로젝트가 진행 중이거나 대기 중인 고객사",
+    rule: "계약·갱신 스페이스가 진행 중이거나 대기 중인 고객사",
     subject: "[안내] 계약 갱신 조건",
-    body: "{이름}님, 안녕하세요.\n{프로젝트} 갱신 조건을 정리해 보내 드립니다.\n보시고 궁금한 점은 이 메일로 회신 주세요.\n감사합니다.",
+    body: "{이름}님, 안녕하세요.\n{스페이스} 갱신 조건을 정리해 보내 드립니다.\n보시고 궁금한 점은 이 메일로 회신 주세요.\n감사합니다.",
     match: (projects) => projects.find((p) => active(p) && /계약|갱신/.test(p.name)),
     personalLine: (_project, monday) => (monday?.amount ? `현재 계약 금액은 ${manwon(monday.amount)}이고, 바뀌는 조건은 첨부에 표시해 드렸습니다.` : null),
   },

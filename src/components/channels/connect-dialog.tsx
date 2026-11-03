@@ -17,7 +17,7 @@ interface ConnectDialogProps {
 
 /**
  * 계정별 권한 키를 입력해 연결 (기능정리 1-4). 한 채널에 계정을 여러 개 연결할 수 있다.
- * 안 B: 채널을 연동할 때 프로젝트를 지정 (기능정리 1-8, 미결)
+ * 안 B: 채널을 연동할 때 스페이스를 지정 (기능정리 1-8, 미결)
  */
 export function ConnectDialog({ channel, account, onClose }: ConnectDialogProps) {
   const { channelAccounts, projects, role, addChannelAccount, updateChannelAccount, removeChannelAccount, notify, logActivity } =
@@ -122,7 +122,7 @@ export function ConnectDialog({ channel, account, onClose }: ConnectDialogProps)
         </span>
       </label>
       {!account && (
-        <Field label="이 계정으로 들어오는 연락을 연결할 프로젝트" hint="안 B: 채널을 연동할 때 프로젝트를 지정하는 방식">
+        <Field label="이 계정으로 들어오는 연락을 연결할 스페이스" hint="안 B: 채널을 연동할 때 스페이스를 지정하는 방식">
           <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className={inputClass}>
             <option value="auto">AI가 자동으로 분류</option>
             {projects.map((p) => (

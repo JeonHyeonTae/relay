@@ -18,7 +18,7 @@ import type { Project } from "@/lib/types";
 
 const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대기: 1, 완료: 2 };
 
-/** 고객사 한 곳과 진행한 프로젝트들. 사람·문서·대화는 각 프로젝트에서 관리한다 */
+/** 고객사 한 곳과 진행한 스페이스들. 사람·문서·대화는 각 스페이스에서 관리한다 */
 export function ClientDetail({ id }: { id: string }) {
   const { accounts, projects, docs } = useDemo();
   const [creating, setCreating] = useState(false);
@@ -29,9 +29,9 @@ export function ClientDetail({ id }: { id: string }) {
     return <p className="p-8 text-sm text-slate-500">고객사를 찾을 수 없어요.</p>;
   }
 
-  // 이 회사 모든 프로젝트 답장에 참고하는 자료
+  // 이 회사 모든 스페이스 답장에 참고하는 자료
   const commonDocs = docs.filter((d) => d.accountId === id);
-  // 진행 중인 프로젝트가 위로
+  // 진행 중인 스페이스가 위로
   const accountProjects = projects
     .filter((p) => p.accountId === id)
     .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
@@ -48,13 +48,13 @@ export function ClientDetail({ id }: { id: string }) {
         <h1 className="text-xl font-semibold">{account.name}</h1>
         <Badge>{account.industry}</Badge>
         <Button variant="primary" className="ml-auto" onClick={() => setCreating(true)}>
-          <Plus className="size-4" />새 프로젝트
+          <Plus className="size-4" />새 스페이스
         </Button>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
         <section className="space-y-3 lg:col-span-2">
-          <h2 className="text-sm font-semibold">프로젝트 {accountProjects.length}</h2>
+          <h2 className="text-sm font-semibold">스페이스 {accountProjects.length}</h2>
           <ul className="space-y-3">
             {accountProjects.map((project) => {
               const monday = mondayOf(project.id);
@@ -62,7 +62,7 @@ export function ClientDetail({ id }: { id: string }) {
               return (
                 <li key={project.id}>
                   <Link
-                    href={`/projects/${project.id}`}
+                    href={`/spaces/${project.id}`}
                     className="block rounded-xl border border-slate-200 bg-white p-4 hover:border-brand-300 hover:bg-brand-50/30"
                   >
                     <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function ClientDetail({ id }: { id: string }) {
               </Link>
             }
           >
-            <p className="mb-3 text-xs text-slate-500">이 회사 모든 프로젝트 답장에 참고하는 자료예요.</p>
+            <p className="mb-3 text-xs text-slate-500">이 회사 모든 스페이스 답장에 참고하는 자료예요.</p>
             {commonDocs.length > 0 && (
               <ul className="space-y-2">
                 {commonDocs.map((d) => (

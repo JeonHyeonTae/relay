@@ -10,8 +10,8 @@ import type { Thread } from "@/lib/types";
 import { ChannelBadge } from "./channel-badge";
 
 /**
- * 여러 대화의 메시지를 시간순 하나의 타임라인으로 보여줌. projectId를 주면 그 프로젝트로 쌓인 메시지만.
- * 여러 프로젝트에 함께 쌓인 메시지는 각 프로젝트에 모두 보이고, 함께 쌓인 다른 프로젝트를 작게 알려 준다.
+ * 여러 대화의 메시지를 시간순 하나의 타임라인으로 보여줌. projectId를 주면 그 스페이스로 쌓인 메시지만.
+ * 여러 스페이스에 함께 쌓인 메시지는 각 스페이스에 모두 보이고, 함께 쌓인 다른 스페이스를 작게 알려 준다.
  * 개인 대화로 표시한 메시지와 연결하지 않은 채팅방의 메시지는 쌓이지 않아 보이지 않는다
  */
 export function CommunicationTimeline({ threads, projectId }: { threads: Thread[]; projectId?: string }) {
@@ -32,7 +32,7 @@ export function CommunicationTimeline({ threads, projectId }: { threads: Thread[
   return (
     <ol className="relative space-y-5 border-l border-slate-200 pl-5">
       {items.map(({ thread, message, tags }) => {
-        // 이 프로젝트 말고 함께 쌓인 프로젝트
+        // 이 스페이스 말고 함께 쌓인 스페이스
         const others = tags
           .filter((id) => id !== projectId)
           .map((id) => projects.find((p) => p.id === id))
@@ -52,7 +52,7 @@ export function CommunicationTimeline({ threads, projectId }: { threads: Thread[
                       {others.map((p, i) => (
                         <Fragment key={p.id}>
                           {i > 0 && ", "}
-                          <Link href={`/projects/${p.id}`} className="hover:text-brand-700 hover:underline">
+                          <Link href={`/spaces/${p.id}`} className="hover:text-brand-700 hover:underline">
                             {p.name}
                           </Link>
                         </Fragment>

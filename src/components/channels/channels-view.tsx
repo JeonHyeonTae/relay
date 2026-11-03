@@ -111,7 +111,7 @@ export function ChannelsView() {
           <div className="min-w-0 flex-1">
             <p className="font-medium">개인 카카오톡</p>
             <p className="text-xs text-slate-500">
-              발송·대화 내역·친구 목록을 가져올 수 없어요. 대화 내보내기 파일을 올리면 그 회사 프로젝트의 대화 내역에 넣어 드려요.
+              발송·대화 내역·친구 목록을 가져올 수 없어요. 대화 내보내기 파일을 올리면 그 회사 스페이스의 대화 내역에 넣어 드려요.
             </p>
           </div>
           <Button onClick={() => setUploadingFile(true)}>

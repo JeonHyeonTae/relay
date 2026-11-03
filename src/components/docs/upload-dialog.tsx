@@ -17,14 +17,14 @@ const KINDS: DocKind[] = ["제안서", "견적서", "계약서", "회의록", "�
 const USES: { value: DocLayer; title: string; desc: string }[] = [
   { value: "standard", title: "회사 기준", desc: "모든 답장에 먼저 적용" },
   { value: "company", title: "회사 자료", desc: "질문에 맞을 때 참고" },
-  { value: "account", title: "고객사 공통 자료", desc: "그 회사 프로젝트 답장에만" },
-  { value: "project", title: "프로젝트 자료", desc: "그 프로젝트 답장에만" },
+  { value: "account", title: "고객사 공통 자료", desc: "그 회사 스페이스 답장에만" },
+  { value: "project", title: "스페이스 자료", desc: "그 스페이스 답장에만" },
 ];
 
 interface UploadDialogProps {
   open: boolean;
   onClose: () => void;
-  /** 프로젝트 화면에서 열면 그 프로젝트 자료로 고정 */
+  /** 스페이스 화면에서 열면 그 스페이스 자료로 고정 */
   projectId?: string;
   /** 지식 베이스에서 회사를 보고 있으면 그 회사 공통 자료로 시작 */
   defaultAccountId?: string;
@@ -34,7 +34,7 @@ export function UploadDialog({ open, onClose, projectId, defaultAccountId }: Upl
   const { projects, accounts, currentUser, role, addDoc, notify } = useDemo();
   const [fileName, setFileName] = useState<string | null>(null);
   const [use, setUse] = useState<DocLayer>(projectId ? "project" : defaultAccountId ? "account" : "company");
-  const [category, setCategory] = useState<Exclude<KnowledgeCategory, "프로젝트" | "고객사">>("문서");
+  const [category, setCategory] = useState<Exclude<KnowledgeCategory, "스페이스" | "고객사">>("문서");
   const [selectedAccount, setSelectedAccount] = useState(defaultAccountId ?? accounts[0].id);
   const [kind, setKind] = useState<DocKind>("기타");
   const [selectedProject, setSelectedProject] = useState(projectId ?? projects[0].id);
@@ -46,7 +46,7 @@ export function UploadDialog({ open, onClose, projectId, defaultAccountId }: Upl
     const title = fileName.replace(/\.[^.]+$/, "");
     addDoc({
       title,
-      category: use === "project" ? "프로젝트" : use === "account" ? "고객사" : category,
+      category: use === "project" ? "스페이스" : use === "account" ? "고객사" : category,
       kind,
       source: "upload",
       accountId: use === "account" ? selectedAccount : undefined,
@@ -108,7 +108,7 @@ export function UploadDialog({ open, onClose, projectId, defaultAccountId }: Upl
       <div className="grid grid-cols-2 gap-3">
         {use === "project" ? (
           !projectId && (
-            <Field label="프로젝트">
+            <Field label="스페이스">
               <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className={inputClass}>
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -132,7 +132,7 @@ export function UploadDialog({ open, onClose, projectId, defaultAccountId }: Upl
           <Field label="분류">
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value as Exclude<KnowledgeCategory, "프로젝트" | "고객사">)}
+              onChange={(e) => setCategory(e.target.value as Exclude<KnowledgeCategory, "스페이스" | "고객사">)}
               className={inputClass}
             >
               <option value="문서">문서</option>

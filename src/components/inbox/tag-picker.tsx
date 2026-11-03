@@ -7,7 +7,7 @@ import { useDemo } from "@/lib/demo-context";
 import { PERSONAL, toggleTag } from "@/lib/thread";
 import type { Thread } from "@/lib/types";
 
-/** 한 방에 연결한 프로젝트를 색으로 구분한다. 개인 대화는 회색 */
+/** 한 방에 연결한 스페이스를 색으로 구분한다. 개인 대화는 회색 */
 const TONES = ["bg-sky-50 text-sky-700", "bg-violet-50 text-violet-700", "bg-emerald-50 text-emerald-700", "bg-amber-50 text-amber-800"];
 const DOTS = ["bg-sky-400", "bg-violet-400", "bg-emerald-400", "bg-amber-400"];
 
@@ -15,7 +15,7 @@ export function tagTone(thread: Thread, tag: string) {
   return tag === PERSONAL ? "bg-slate-100 text-slate-500" : TONES[thread.projectIds.indexOf(tag) % TONES.length];
 }
 
-/** 쌓을 곳 후보: 방에 연결한 프로젝트, 그리고 개인 대화 */
+/** 쌓을 곳 후보: 방에 연결한 스페이스, 그리고 개인 대화 */
 export function useTagOptions(thread: Thread) {
   const { projects } = useDemo();
   const linked = thread.projectIds.map((id) => projects.find((p) => p.id === id)).filter((p) => p !== undefined);
@@ -29,8 +29,8 @@ interface PickerProps {
 }
 
 /**
- * 쌓을 곳을 칩으로 켜고 끈다. 한 메시지에 여러 프로젝트 얘기가 있으면 여러 개를 켠다.
- * 개인 대화는 프로젝트와 함께 고를 수 없다
+ * 쌓을 곳을 칩으로 켜고 끈다. 한 메시지에 여러 스페이스 얘기가 있으면 여러 개를 켠다.
+ * 개인 대화는 스페이스와 함께 고를 수 없다
  */
 export function TagToggles({ thread, tags, onChange }: PickerProps) {
   const options = useTagOptions(thread);
@@ -45,7 +45,7 @@ export function TagToggles({ thread, tags, onChange }: PickerProps) {
             type="button"
             aria-pressed={on}
             onClick={() => onChange(toggleTag(tags, o.id))}
-            title={personal ? "프로젝트에 쌓지 않고 AI 학습에도 쓰지 않아요" : "다른 프로젝트와 함께 고를 수 있어요"}
+            title={personal ? "스페이스에 쌓지 않고 AI 학습에도 쓰지 않아요" : "다른 스페이스와 함께 고를 수 있어요"}
             className={cn(
               "inline-flex h-7 max-w-48 items-center gap-1 rounded-full border px-2.5 text-xs transition-colors",
               on
@@ -62,7 +62,7 @@ export function TagToggles({ thread, tags, onChange }: PickerProps) {
   );
 }
 
-/** 쌓을 곳 고르기 메뉴. 메시지 아래 표시와, 연결한 프로젝트가 많은 방의 입력칸에서 연다 */
+/** 쌓을 곳 고르기 메뉴. 메시지 아래 표시와, 연결한 스페이스가 많은 방의 입력칸에서 연다 */
 export function TagMenu({
   thread,
   tags,
@@ -107,7 +107,7 @@ export function TagMenu({
             side === "top" ? "bottom-full mb-1" : "top-full mt-1",
           )}
         >
-          <p className="px-2 pt-1 pb-1.5 text-xs text-slate-500">여러 프로젝트에 함께 쌓을 수 있어요</p>
+          <p className="px-2 pt-1 pb-1.5 text-xs text-slate-500">여러 스페이스에 함께 쌓을 수 있어요</p>
           {options.map((o, i) => {
             const on = tags.includes(o.id);
             const personal = o.id === PERSONAL;

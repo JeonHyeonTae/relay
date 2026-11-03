@@ -44,7 +44,7 @@ export interface Contact {
   phone?: string;
 }
 
-/** 고객사(거래 중인 회사). 사람은 회사가 아니라 프로젝트 참여자로 관리한다 */
+/** 고객사(거래 중인 회사). 사람은 회사가 아니라 스페이스 참여자로 관리한다 */
 export interface Account {
   id: string;
   name: string;
@@ -52,6 +52,7 @@ export interface Account {
   contacts: Contact[];
 }
 
+/** 화면에서는 "스페이스"라고 부른다(2026-11-03 "프로젝트"에서 바꿈). 코드 이름은 project를 그대로 쓴다 */
 export interface Project {
   id: string;
   accountId: string;
@@ -70,18 +71,18 @@ export interface Message {
   body: string;
   at: string;
   /**
-   * 어느 프로젝트 대화로 쌓을지. 한 메시지에 여러 프로젝트 얘기가 섞이면 그 프로젝트 모두에 쌓는다.
-   * 보낼 때 고르고, 받은 메시지는 AI가 붙인다. 없으면 채팅방에 처음 연결한 프로젝트
+   * 어느 스페이스 대화로 쌓을지. 한 메시지에 여러 스페이스 얘기가 섞이면 그 스페이스 모두에 쌓는다.
+   * 보낼 때 고르고, 받은 메시지는 AI가 붙인다. 없으면 채팅방에 처음 연결한 스페이스
    */
   projectIds?: string[];
-  /** 사적인 대화: 프로젝트 소통 내역과 AI 학습에 쓰지 않는다 */
+  /** 사적인 대화: 스페이스 소통 내역과 AI 학습에 쓰지 않는다 */
   personal?: boolean;
 }
 
 export interface Thread {
   id: string;
   accountId: string;
-  /** 이 채팅방을 연결한 프로젝트(n:m). 한 방에서 여러 프로젝트 얘기를 하기도 하고, 사적인 연락처라 아무 데도 연결하지 않기도 한다 */
+  /** 이 채팅방을 연결한 스페이스(n:m). 한 방에서 여러 스페이스 얘기를 하기도 하고, 사적인 연락처라 아무 데도 연결하지 않기도 한다 */
   projectIds: string[];
   channel: ChannelId;
   /** 이 대화가 들어온 계정(ChannelAccount id). 답장도 이 계정으로 나간다 */
@@ -132,7 +133,7 @@ export interface DraftSource {
 export interface SimilarCase {
   id: string;
   title: string;
-  /** 그 건이 있었던 프로젝트와 대화 */
+  /** 그 건이 있었던 스페이스와 대화 */
   projectId: string;
   threadId: string;
   /** 당시 처리한 직원 */
@@ -153,7 +154,7 @@ export interface SimilarCase {
   match: number;
 }
 
-/** 프로젝트를 이어받는 사람이 먼저 읽는 요약 (기능정리 3-3) */
+/** 스페이스를 이어받는 사람이 먼저 읽는 요약 (기능정리 3-3) */
 export interface HandoverBrief {
   projectId: string;
   summary: string;
@@ -161,7 +162,7 @@ export interface HandoverBrief {
   promises: string[];
 }
 
-export type KnowledgeCategory = "문서" | "영업" | "회사 지식" | "고객사" | "프로젝트";
+export type KnowledgeCategory = "문서" | "영업" | "회사 지식" | "고객사" | "스페이스";
 
 export type DocKind = "제안서" | "견적서" | "계약서" | "회의록" | "사양서" | "보고서" | "매뉴얼" | "소개서" | "기타";
 
@@ -174,7 +175,7 @@ export interface KnowledgeDoc {
   category: KnowledgeCategory;
   kind: DocKind;
   source: DocSource;
-  /** 고객사 공통 자료: 그 고객사 모든 프로젝트 답장에 참고. 계약 조건, 출입 수칙, 보안 요구사항 등 */
+  /** 고객사 공통 자료: 그 고객사 모든 스페이스 답장에 참고. 계약 조건, 출입 수칙, 보안 요구사항 등 */
   accountId?: string;
   projectId?: string;
   updatedAt: string;
@@ -187,7 +188,7 @@ export interface KnowledgeDoc {
   highlights: string[];
 }
 
-/** 대화·문서에서 뽑아 둔 프로젝트 핵심 정보 */
+/** 대화·문서에서 뽑아 둔 스페이스 핵심 정보 */
 export interface ProjectFact {
   id: string;
   projectId: string;
@@ -213,7 +214,7 @@ export interface MondayTask {
   threadId?: string;
 }
 
-/** 프로젝트와 연결된 먼데이 아이템. 원본은 먼데이에 있고 릴레이는 받아와 보여 준다 */
+/** 스페이스와 연결된 먼데이 아이템. 원본은 먼데이에 있고 릴레이는 받아와 보여 준다 */
 export interface MondayItem {
   projectId: string;
   stage: { label: string; color: MondayColor };
@@ -236,7 +237,7 @@ export interface ActivityEntry {
   text: string;
 }
 
-/** 프로젝트 회의. 회의록을 올리거나 노트테이커(2차 서비스) 녹음이 들어오면 AI가 정리한다 */
+/** 스페이스 회의. 회의록을 올리거나 노트테이커(2차 서비스) 녹음이 들어오면 AI가 정리한다 */
 export interface Meeting {
   id: string;
   projectId: string;

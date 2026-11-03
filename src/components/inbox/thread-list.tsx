@@ -13,7 +13,7 @@ interface ThreadListProps {
   threads: Thread[];
   selectedId?: string;
   onSelect: (id: string) => void;
-  /** 줄 오른쪽 끝에 붙일 것 (프로젝트 채팅방 탭의 연결 끊기 등) */
+  /** 줄 오른쪽 끝에 붙일 것 (스페이스 채팅방 탭의 연결 끊기 등) */
   trailing?: (thread: Thread) => ReactNode;
 }
 

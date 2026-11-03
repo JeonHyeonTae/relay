@@ -12,8 +12,8 @@ import { isMyChat, lastAt, lastMessage, roomName } from "@/lib/thread";
 import type { Project, Thread } from "@/lib/types";
 
 /**
- * 프로젝트에 채팅방 연결: 내가 참여한 채팅방 중에서 고른다. 한 채팅방을 여러 프로젝트에 연결할 수 있고(n:m),
- * 연결하면 그 방의 대화가 이 프로젝트 소통 내역에 쌓인다. 개인 대화로 표시한 메시지는 빠진다
+ * 스페이스에 채팅방 연결: 내가 참여한 채팅방 중에서 고른다. 한 채팅방을 여러 스페이스에 연결할 수 있고(n:m),
+ * 연결하면 그 방의 대화가 이 스페이스 소통 내역에 쌓인다. 개인 대화로 표시한 메시지는 빠진다
  */
 export function LinkChatDialog({ project, onClose }: { project: Project; onClose: () => void }) {
   const { threads, accounts, projects, currentUser, role, linkThreads, notify, logActivity } = useDemo();
@@ -37,7 +37,7 @@ export function LinkChatDialog({ project, onClose }: { project: Project; onClose
   const submit = () => {
     const names = threads.filter((t) => picked.includes(t.id)).map((t) => roomName(t, currentUser.id));
     linkThreads(project.id, picked);
-    notify(`채팅방 ${picked.length}개를 연결했어요. 대화가 이 프로젝트 소통 내역에 쌓여요.`);
+    notify(`채팅방 ${picked.length}개를 연결했어요. 대화가 이 스페이스 소통 내역에 쌓여요.`);
     logActivity(`'${project.name}'에 채팅방 ${names.map((n) => `'${n}'`).join(", ")} 연결`);
     onClose();
   };
@@ -62,7 +62,7 @@ export function LinkChatDialog({ project, onClose }: { project: Project; onClose
             </p>
             <p className="truncate text-xs text-slate-500">{last?.body ?? "새 대화"}</p>
             <p className="truncate text-xs text-slate-400">
-              {t.projectIds.length > 0 ? `연결된 프로젝트: ${t.projectIds.map(projectName).join(", ")}` : "연결된 프로젝트 없음"}
+              {t.projectIds.length > 0 ? `연결된 스페이스: ${t.projectIds.map(projectName).join(", ")}` : "연결된 스페이스 없음"}
             </p>
           </div>
         </label>
@@ -75,7 +75,7 @@ export function LinkChatDialog({ project, onClose }: { project: Project; onClose
       open
       onClose={onClose}
       title="채팅방 연결"
-      description="내가 참여한 채팅방 중에서 골라요. 한 채팅방을 여러 프로젝트에 연결할 수 있어요. 연결하면 그 방의 대화가 이 프로젝트 소통 내역에 쌓이고, 개인 대화로 표시한 메시지는 빠져요."
+      description="내가 참여한 채팅방 중에서 골라요. 한 채팅방을 여러 스페이스에 연결할 수 있어요. 연결하면 그 방의 대화가 이 스페이스 소통 내역에 쌓이고, 개인 대화로 표시한 메시지는 빠져요."
       footer={
         <>
           <Button onClick={onClose}>취소</Button>

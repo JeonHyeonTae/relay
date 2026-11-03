@@ -57,11 +57,11 @@ interface DemoContextValue {
   /** 활동 기록 (보안 검토용) */
   activity: ActivityEntry[];
   logActivity: (text: string) => void;
-  /** tags: 이 메시지를 쌓을 프로젝트 id들(여러 개 가능), 또는 [PERSONAL](개인 대화라 쌓지 않음) */
+  /** tags: 이 메시지를 쌓을 스페이스 id들(여러 개 가능), 또는 [PERSONAL](개인 대화라 쌓지 않음) */
   sendReply: (threadId: string, body: string, edited: boolean, tags: string[]) => void;
   /** 받은 메시지 등 이미 있는 메시지가 쌓일 곳을 바꾼다 */
   tagMessage: (threadId: string, messageId: string, tags: string[]) => void;
-  /** 프로젝트에 채팅방을 연결한다. 한 채팅방을 여러 프로젝트에 연결할 수 있다 */
+  /** 스페이스에 채팅방을 연결한다. 한 채팅방을 여러 스페이스에 연결할 수 있다 */
   linkThreads: (projectId: string, threadIds: string[]) => void;
   unlinkThread: (projectId: string, threadId: string) => void;
   markRead: (threadId: string) => void;
@@ -111,8 +111,8 @@ const DEFAULT_TEAM: TeamSettings = {
 };
 
 /**
- * 연결을 바꾸기 전에 표시 없는 메시지를 지금 쌓이는 곳(처음 연결한 프로젝트)으로 굳혀 둔다.
- * 그래야 연결을 끊거나 더해도 이미 쌓인 메시지가 다른 프로젝트로 옮겨 가지 않는다
+ * 연결을 바꾸기 전에 표시 없는 메시지를 지금 쌓이는 곳(처음 연결한 스페이스)으로 굳혀 둔다.
+ * 그래야 연결을 끊거나 더해도 이미 쌓인 메시지가 다른 스페이스로 옮겨 가지 않는다
  */
 function pinTags(t: Thread): Thread {
   const first = t.projectIds[0];
@@ -208,9 +208,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           }, 2500);
         }
       }
-      // 개인 대화는 프로젝트에 쌓지 않고 학습에도 쓰지 않는다
+      // 개인 대화는 스페이스에 쌓지 않고 학습에도 쓰지 않는다
       if (personal) {
-        notify("발송했어요. 개인 대화라 프로젝트에 쌓지 않아요.");
+        notify("발송했어요. 개인 대화라 스페이스에 쌓지 않아요.");
       } else if (edited) {
         setLearnedEdits((n) => n + 1);
         notify("발송했어요. 고친 초안은 학습 데이터로 저장했어요.");
@@ -281,7 +281,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       const from = threads.find((t) => t.id === fromThreadId);
       if (!c || !from) return fromThreadId;
       // 이미 그 사람과 1:1 채팅이 있으면 그 방, 없으면 새로 만든다.
-      // 논의 필요: 1:1 채팅을 고객사·프로젝트에 묶으면 소통 내역에 보인다 (화면별_기능정리.md "논의할 것")
+      // 논의 필요: 1:1 채팅을 고객사·스페이스에 묶으면 소통 내역에 보인다 (화면별_기능정리.md "논의할 것")
       let chatId = threads.find((t) => t.dmWith === c.ownerId && t.ownerId === currentUser.id)?.id;
       if (!chatId) {
         const id = `dm-${c.ownerId}-${Date.now()}`;
@@ -289,7 +289,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         const chat: Thread = {
           id,
           accountId: from.accountId,
-          // 동료와의 1:1 채팅은 프로젝트에 연결하지 않고 시작한다. 필요하면 프로젝트 화면에서 연결한다
+          // 동료와의 1:1 채팅은 스페이스에 연결하지 않고 시작한다. 필요하면 스페이스 화면에서 연결한다
           projectIds: [],
           channel: "gchat",
           via: channelAccounts.find((a) => a.channel === "gchat" && a.ownerId === currentUser.id)?.id,

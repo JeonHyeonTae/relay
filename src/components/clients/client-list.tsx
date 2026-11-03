@@ -12,7 +12,7 @@ import { SCENARIOS, type ScenarioKey } from "@/lib/bulk-mail";
 import { useDemo } from "@/lib/demo-context";
 import { BulkSendDialog } from "./bulk-send-dialog";
 
-/** 거래 중인 고객사 목록. 회사를 누르면 그 회사와 한 프로젝트들이 나온다 (기능정리 3-1).
+/** 거래 중인 고객사 목록. 회사를 누르면 그 회사와 한 스페이스들이 나온다 (기능정리 3-1).
     공지·정기 일정·계약 갱신처럼 여러 곳에 같은 일로 보낼 메일은 여기서 한 번에 보낸다 */
 export function ClientList() {
   const router = useRouter();
@@ -39,14 +39,14 @@ export function ClientList() {
         done: accountProjects.filter((p) => p.status === "완료").length,
       };
     })
-    // 진행 중인 프로젝트가 많은 회사가 위로, 다음은 대기, 같으면 가나다순
+    // 진행 중인 스페이스가 많은 회사가 위로, 다음은 대기, 같으면 가나다순
     .sort((a, b) => b.active - a.active || b.waiting - a.waiting || a.account.name.localeCompare(b.account.name, "ko"));
 
   return (
     <div className="pb-10">
       <PageHeader
         title="고객사"
-        description="거래 중인 고객사 목록이에요. 회사를 누르면 그 회사와 진행한 프로젝트를 볼 수 있어요."
+        description="거래 중인 고객사 목록이에요. 회사를 누르면 그 회사와 진행한 스페이스를 볼 수 있어요."
         actions={
           <Button variant="primary" onClick={() => setSending("notice")}>
             <Mail className="size-4" />

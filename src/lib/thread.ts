@@ -10,12 +10,12 @@ export function isMyChat(thread: Thread, me: Staff) {
   );
 }
 
-/** 메시지를 개인 대화로 표시할 때 쓰는 값. 프로젝트 id와 겹치지 않는다 */
+/** 메시지를 개인 대화로 표시할 때 쓰는 값. 스페이스 id와 겹치지 않는다 */
 export const PERSONAL = "personal";
 
 /**
- * 메시지가 쌓이는 곳: 프로젝트 id 여러 개, 개인 대화([PERSONAL]), 아무 데도 안 쌓임([]).
- * 표시가 없는 메시지는 채팅방에 처음 연결한 프로젝트로 본다. 연결을 끊은 프로젝트에는 쌓지 않는다
+ * 메시지가 쌓이는 곳: 스페이스 id 여러 개, 개인 대화([PERSONAL]), 아무 데도 안 쌓임([]).
+ * 표시가 없는 메시지는 채팅방에 처음 연결한 스페이스로 본다. 연결을 끊은 스페이스에는 쌓지 않는다
  */
 export function messageTags(thread: Thread, m: Message): string[] {
   if (m.personal) return [PERSONAL];
@@ -23,7 +23,7 @@ export function messageTags(thread: Thread, m: Message): string[] {
   return thread.projectIds.slice(0, 1);
 }
 
-/** 답장을 쓸 때 처음 골라 둘 곳: 마지막으로 쌓인 메시지와 같은 곳. 연결한 프로젝트가 없으면 개인 대화 */
+/** 답장을 쓸 때 처음 골라 둘 곳: 마지막으로 쌓인 메시지와 같은 곳. 연결한 스페이스가 없으면 개인 대화 */
 export function defaultTags(thread: Thread): string[] {
   for (let i = thread.messages.length - 1; i >= 0; i--) {
     const tags = messageTags(thread, thread.messages[i]);
@@ -32,7 +32,7 @@ export function defaultTags(thread: Thread): string[] {
   return thread.projectIds.length ? [thread.projectIds[0]] : [PERSONAL];
 }
 
-/** 쌓을 곳 하나를 켜고 끈다. 개인 대화는 프로젝트와 함께 고를 수 없고, 프로젝트는 마지막 하나를 끌 수 없다 */
+/** 쌓을 곳 하나를 켜고 끈다. 개인 대화는 스페이스와 함께 고를 수 없고, 스페이스는 마지막 하나를 끌 수 없다 */
 export function toggleTag(tags: string[], id: string): string[] {
   if (id === PERSONAL) return [PERSONAL];
   const picked = tags.filter((t) => t !== PERSONAL);
@@ -40,7 +40,7 @@ export function toggleTag(tags: string[], id: string): string[] {
   return picked.length > 1 ? picked.filter((t) => t !== id) : picked;
 }
 
-/** 메시지마다 어디에 쌓이는지 보여 줄 방: 여러 프로젝트에 연결했거나 개인 대화가 섞였을 때 */
+/** 메시지마다 어디에 쌓이는지 보여 줄 방: 여러 스페이스에 연결했거나 개인 대화가 섞였을 때 */
 export function needsTags(thread: Thread) {
   return thread.projectIds.length > 1 || thread.messages.some((m) => m.personal);
 }

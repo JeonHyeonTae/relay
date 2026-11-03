@@ -40,7 +40,7 @@ export function Topbar() {
         className="flex h-9 max-w-md min-w-0 flex-1 items-center gap-2 rounded-lg bg-slate-100 px-3 text-sm text-slate-400 hover:bg-slate-200/60"
       >
         <Search className="size-4 shrink-0" />
-        <span className="flex-1 truncate text-left">프로젝트·고객사·대화·문서 검색</span>
+        <span className="flex-1 truncate text-left">스페이스·고객사·대화·문서 검색</span>
         <kbd className="hidden rounded border border-slate-200 bg-white px-1.5 text-xs text-slate-400 sm:inline">Ctrl K</kbd>
       </button>
 

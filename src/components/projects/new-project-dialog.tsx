@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 import { useDemo } from "@/lib/demo-context";
 import type { ChannelId } from "@/lib/types";
 
-/** 안 A: 프로젝트를 만들 때 어떤 소통 창구를 쓰는지 묻고 그 채널만 연결 (기능정리 1-8, 미결) */
+/** 안 A: 스페이스를 만들 때 어떤 소통 창구를 쓰는지 묻고 그 채널만 연결 (기능정리 1-8, 미결) */
 export function NewProjectDialog({ open, onClose, accountId }: { open: boolean; onClose: () => void; accountId?: string }) {
   const { accounts, connected, addProject, notify, currentUser } = useDemo();
   const [selectedAccount, setSelectedAccount] = useState(accountId ?? accounts[0].id);
@@ -21,7 +21,7 @@ export function NewProjectDialog({ open, onClose, accountId }: { open: boolean; 
 
   const submit = () => {
     addProject({ accountId: selectedAccount, name: name.trim(), status: "진행 중", channels, memberIds: [currentUser.id] });
-    notify(`'${name.trim()}' 프로젝트를 만들었어요.`);
+    notify(`'${name.trim()}' 스페이스를 만들었어요.`);
     setName("");
     onClose();
   };
@@ -30,9 +30,9 @@ export function NewProjectDialog({ open, onClose, accountId }: { open: boolean; 
     <Modal
       open={open}
       onClose={onClose}
-      title="새 프로젝트"
+      title="새 스페이스"
       tag="안 A"
-      description="프로젝트를 만들 때 소통 창구를 고르면, 그 채널로 오는 이 회사의 연락만 프로젝트에 모입니다."
+      description="스페이스를 만들 때 소통 창구를 고르면, 그 채널로 오는 이 회사의 연락만 스페이스에 모입니다."
       footer={
         <>
           <Button onClick={onClose}>취소</Button>
@@ -51,11 +51,11 @@ export function NewProjectDialog({ open, onClose, accountId }: { open: boolean; 
           ))}
         </select>
       </Field>
-      <Field label="프로젝트 이름">
+      <Field label="스페이스 이름">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 3공장 설비 증설" className={inputClass} />
       </Field>
       <div className="space-y-1.5">
-        <p className="text-sm font-medium text-slate-700">이 프로젝트는 어떤 소통 창구를 쓰나요?</p>
+        <p className="text-sm font-medium text-slate-700">이 스페이스는 어떤 소통 창구를 쓰나요?</p>
         <div className="grid grid-cols-2 gap-2">
           {connected.map((id) => (
             <button

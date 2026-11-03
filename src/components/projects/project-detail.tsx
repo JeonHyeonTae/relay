@@ -74,7 +74,7 @@ const mentions = (thread: Thread, name: string) =>
   Boolean(thread.group?.members.some((member) => member.startsWith(name)));
 
 /**
- * 프로젝트를 열면 개요부터: 요약·지금 할 일·핵심 정보·최근 문서를 한 화면에.
+ * 스페이스를 열면 개요부터: 요약·지금 할 일·핵심 정보·최근 문서를 한 화면에.
  * 오른쪽에는 사람(참여자·고객사 연락처)과 모든 답장에 먼저 적용되는 회사 기준 (기능정리 3-2, 3-3, 5-1~5-3)
  */
 export function ProjectDetail({ id }: { id: string }) {
@@ -98,21 +98,21 @@ export function ProjectDetail({ id }: { id: string }) {
 
   const project = projects.find((p) => p.id === id);
   if (!project) {
-    return <p className="p-8 text-sm text-slate-500">프로젝트를 찾을 수 없어요.</p>;
+    return <p className="p-8 text-sm text-slate-500">스페이스를 찾을 수 없어요.</p>;
   }
 
   const account = accounts.find((a) => a.id === project.accountId);
   const members = project.memberIds.map(findStaff);
   const brief = HANDOVERS.find((h) => h.projectId === id);
   const projectDocs = docs.filter((d) => d.projectId === id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  // 이 프로젝트에 연결한 채팅방. 한 채팅방이 여러 프로젝트에 연결될 수 있다
+  // 이 스페이스에 연결한 채팅방. 한 채팅방이 여러 스페이스에 연결될 수 있다
   const allThreads = threads.filter((t) => t.projectIds.includes(id));
   const readable = visibleThreads(allThreads, currentUser, role);
   const hiddenCount = allThreads.length - readable.length;
   const myChats = readable.filter((t) => isMyChat(t, currentUser)).sort((a, b) => lastAt(b) - lastAt(a));
   // 탭을 열지 않아도 보이게, 내 채팅방의 안 읽은 메시지 수를 탭 이름 옆에 붙인다
   const myUnread = myChats.reduce((sum, t) => sum + (t.unread ?? 0), 0);
-  // 고객사 연락처는 이 프로젝트 대화에 나온 사람만 자동으로 모은다. 쓰는 채널과 가장 최근 대화도 함께
+  // 고객사 연락처는 이 스페이스 대화에 나온 사람만 자동으로 모은다. 쓰는 채널과 가장 최근 대화도 함께
   const contacts = (account?.contacts ?? [])
     .filter((c) => allThreads.some((t) => mentions(t, c.name)))
     .map((c) => {
@@ -120,7 +120,7 @@ export function ProjectDetail({ id }: { id: string }) {
       const channels = Array.from(new Set(withThem.map((t) => t.channel))) as ChannelId[];
       return { contact: c, channels, latest: withThem[0] };
     });
-  // 연결한 채팅방이라도 다른 프로젝트 얘기나 개인 대화로 표시한 메시지는 세지 않는다
+  // 연결한 채팅방이라도 다른 스페이스 얘기나 개인 대화로 표시한 메시지는 세지 않는다
   const messageCount = readable.reduce((sum, t) => sum + t.messages.filter((m) => messageTags(t, m).includes(id)).length, 0);
   const facts = PROJECT_FACTS.filter((f) => f.projectId === id);
   const companyDocs = docs.filter((d) => docLayer(d) === "standard");
@@ -133,9 +133,9 @@ export function ProjectDetail({ id }: { id: string }) {
     <div className="space-y-5 px-8 py-6">
       <BackToConversation />
       <div className="flex items-center gap-1 text-xs text-slate-500">
-        <Link href="/projects" className="inline-flex items-center gap-1 hover:text-slate-700">
+        <Link href="/spaces" className="inline-flex items-center gap-1 hover:text-slate-700">
           <ArrowLeft className="size-3.5" />
-          프로젝트
+          스페이스
         </Link>
         {account && (
           <>
@@ -230,7 +230,7 @@ export function ProjectDetail({ id }: { id: string }) {
 
           {tab === "overview" && (
             <>
-              <Card title="프로젝트 요약" icon={<Sparkles className="size-4 text-brand-600" />}>
+              <Card title="스페이스 요약" icon={<Sparkles className="size-4 text-brand-600" />}>
                 <p className="text-sm leading-relaxed text-slate-700">
                   {brief?.summary ?? "아직 요약이 없어요. 대화와 문서가 쌓이면 AI가 정리해요."}
                 </p>
@@ -327,7 +327,7 @@ export function ProjectDetail({ id }: { id: string }) {
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="min-w-0 flex-1 text-xs text-slate-500">
-                  이 프로젝트에 연결한 채팅방 중 내가 참여한 방이에요. 한 채팅방을 여러 프로젝트에 연결할 수 있어요.
+                  이 스페이스에 연결한 채팅방 중 내가 참여한 방이에요. 한 채팅방을 여러 스페이스에 연결할 수 있어요.
                 </p>
                 <Button size="sm" onClick={() => setLinking(true)}>
                   <Link2 className="size-3.5" />
@@ -336,7 +336,7 @@ export function ProjectDetail({ id }: { id: string }) {
               </div>
               {myChats.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
-                  연결한 채팅방이 없어요. 채팅방 연결로 이 프로젝트 얘기를 하는 방을 넣어 주세요.
+                  연결한 채팅방이 없어요. 채팅방 연결로 이 스페이스 얘기를 하는 방을 넣어 주세요.
                 </p>
               ) : (
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -351,9 +351,9 @@ export function ProjectDetail({ id }: { id: string }) {
                           {others.length > 0 && (
                             <span
                               className="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs whitespace-nowrap text-slate-500"
-                              title={`함께 연결한 프로젝트: ${others.map((p) => projects.find((x) => x.id === p)?.name).join(", ")}`}
+                              title={`함께 연결한 스페이스: ${others.map((p) => projects.find((x) => x.id === p)?.name).join(", ")}`}
                             >
-                              다른 프로젝트 {others.length}
+                              다른 스페이스 {others.length}
                             </span>
                           )}
                           <button
@@ -381,7 +381,7 @@ export function ProjectDetail({ id }: { id: string }) {
           {tab === "docs" && (
             <>
               <DocTable docs={projectDocs} onOpen={setOpenDocId} />
-              <p className="text-xs text-slate-500">메일·메신저로 주고받은 첨부파일은 자동으로 이 프로젝트 문서에 저장됩니다.</p>
+              <p className="text-xs text-slate-500">메일·메신저로 주고받은 첨부파일은 자동으로 이 스페이스 문서에 저장됩니다.</p>
             </>
           )}
 
@@ -390,7 +390,7 @@ export function ProjectDetail({ id }: { id: string }) {
             <Card>
               <CommunicationTimeline threads={readable} projectId={id} />
               <p className="mt-5 text-xs text-slate-400">
-                연결한 채팅방에서 이 프로젝트로 쌓인 메시지만 보여요. 다른 프로젝트 얘기와 개인 대화로 표시한 메시지는 빠지고, 여러 프로젝트에 함께 쌓인 메시지는 표시가 붙어요.
+                연결한 채팅방에서 이 스페이스로 쌓인 메시지만 보여요. 다른 스페이스 얘기와 개인 대화로 표시한 메시지는 빠지고, 여러 스페이스에 함께 쌓인 메시지는 표시가 붙어요.
               </p>
               {hiddenCount > 0 && (
                 <p className="mt-5 flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
@@ -519,7 +519,7 @@ export function ProjectDetail({ id }: { id: string }) {
               </Link>
             }
           >
-            <p className="-mt-1 mb-3 text-xs text-slate-500">이 프로젝트 문서보다 먼저, 모든 답장에 적용되는 자료예요.</p>
+            <p className="-mt-1 mb-3 text-xs text-slate-500">이 스페이스 문서보다 먼저, 모든 답장에 적용되는 자료예요.</p>
             <ul className="space-y-2">
               {companyDocs.map((d) => (
                 <li key={d.id}>
@@ -546,7 +546,7 @@ export function ProjectDetail({ id }: { id: string }) {
                 </Link>
               }
             >
-              <p className="-mt-1 mb-3 text-xs text-slate-500">이 회사 모든 프로젝트 답장에 함께 참고하는 자료예요.</p>
+              <p className="-mt-1 mb-3 text-xs text-slate-500">이 회사 모든 스페이스 답장에 함께 참고하는 자료예요.</p>
               <ul className="space-y-2">
                 {commonDocs.map((d) => (
                   <li key={d.id}>
@@ -609,7 +609,7 @@ function WorkStatus({ item, done, onShowAll }: { item?: MondayItem; done: boolea
       >
         <div className="flex flex-wrap items-center gap-3">
           <p className="flex-1 text-sm text-slate-500">
-            먼데이와 연결되지 않은 프로젝트예요. 연결하면 진행 단계·마감·업무를 여기서 함께 봐요.
+            먼데이와 연결되지 않은 스페이스예요. 연결하면 진행 단계·마감·업무를 여기서 함께 봐요.
           </p>
           <Button size="sm" onClick={() => notify("데모에서는 연결 창 대신 알림만 보여요.")}>
             먼데이 아이템 연결

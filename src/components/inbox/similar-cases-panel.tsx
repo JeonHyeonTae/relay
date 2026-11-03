@@ -29,7 +29,7 @@ interface SimilarCasesPanelProps {
 /**
  * 신규 문의에 비슷한 과거 건을 보여 주고, 그 건을 참고해 답장하게 돕는다 (기능정리 4-1, 4-2).
  * 무엇을 기준으로 찾았는지, 어디가 비슷한지, 당시 어떻게 해결했는지를 함께 보여 주고
- * 초안 쓰기·당시 대화·프로젝트·처리한 사람으로 바로 이어 준다.
+ * 초안 쓰기·당시 대화·스페이스·처리한 사람으로 바로 이어 준다.
  * 넓은 화면에서는 오른쪽에 고정, 좁은 화면에서는 open일 때 서랍으로 연다.
  */
 export function SimilarCasesPanel({ thread, open, onClose, onUseCase, onAsk }: SimilarCasesPanelProps) {
@@ -111,11 +111,11 @@ export function SimilarCasesPanel({ thread, open, onClose, onUseCase, onAsk }: S
                     <ArrowUpRight className="size-3" />
                   </Link>
                   <Link
-                    href={`/projects/${c.projectId}?from=${thread.id}`}
+                    href={`/spaces/${c.projectId}?from=${thread.id}`}
                     onClick={() => keepThreadInHistory(thread.id)}
                     className="inline-flex items-center text-brand-600 hover:underline"
                   >
-                    {project?.name ?? "프로젝트"}
+                    {project?.name ?? "스페이스"}
                     <ArrowUpRight className="size-3" />
                   </Link>
                   {owner.id !== currentUser.id && (

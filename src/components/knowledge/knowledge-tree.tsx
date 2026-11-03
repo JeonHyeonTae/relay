@@ -12,8 +12,8 @@ export type Scope = { kind: "company" } | { kind: "account"; id: string } | { ki
 const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대기: 1, 완료: 2 };
 
 /**
- * 왼쪽 트리: 우리 회사(공통) → 고객사 → 프로젝트.
- * 진행 중인 프로젝트가 없는 회사는 접어 둔다
+ * 왼쪽 트리: 우리 회사(공통) → 고객사 → 스페이스.
+ * 진행 중인 스페이스가 없는 회사는 접어 둔다
  */
 export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (scope: Scope) => void }) {
   const { accounts, projects, docs } = useDemo();
@@ -24,7 +24,7 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
   );
   const toggle = (id: string) => setCollapsed((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   const select = (next: Scope) => {
-    // 접힌 회사의 프로젝트를 고르면 그 회사를 편다
+    // 접힌 회사의 스페이스를 고르면 그 회사를 편다
     const accountId =
       next.kind === "account" ? next.id : next.kind === "project" ? projects.find((p) => p.id === next.id)?.accountId : undefined;
     if (accountId) setCollapsed((prev) => prev.filter((x) => x !== accountId));

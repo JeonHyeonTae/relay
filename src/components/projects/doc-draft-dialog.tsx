@@ -15,7 +15,7 @@ type Kind = "견적서" | "계약서";
 
 /**
  * 견적서·계약서 초안 (기능정리 2-7, 검토).
- * 회사 기준(단가표·표준 약관)과 프로젝트 핵심 정보로 AI가 초안을 만들고, 사람이 확인해 프로젝트 문서로 저장한다
+ * 회사 기준(단가표·표준 약관)과 스페이스 핵심 정보로 AI가 초안을 만들고, 사람이 확인해 스페이스 문서로 저장한다
  */
 export function DocDraftDialog({ project, onClose }: { project: Project; onClose: () => void }) {
   const { accounts, docs, addDoc, notify, logActivity, currentUser } = useDemo();
@@ -33,7 +33,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
   const save = () => {
     addDoc({
       title: `${project.name} ${kind} 초안`,
-      category: "프로젝트",
+      category: "스페이스",
       kind,
       source: "upload",
       projectId: project.id,
@@ -55,7 +55,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
       onClose={onClose}
       size="lg"
       title="문서 초안 만들기"
-      description="회사 기준(단가표·표준 약관)과 이 프로젝트의 핵심 정보로 AI가 초안을 만들어요. 보내기 전에 꼭 확인해 주세요."
+      description="회사 기준(단가표·표준 약관)과 이 스페이스의 핵심 정보로 AI가 초안을 만들어요. 보내기 전에 꼭 확인해 주세요."
       footer={
         <>
           <Button onClick={() => notify("데모에서는 내려받기 대신 알림만 보여요.")}>
@@ -64,7 +64,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
           </Button>
           <Button variant="primary" onClick={save} disabled={items.length === 0}>
             <FilePlus2 className="size-4" />
-            프로젝트 문서로 저장
+            스페이스 문서로 저장
           </Button>
         </>
       }
@@ -166,7 +166,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
       <p className="flex items-start gap-1.5 text-xs text-slate-500">
         <Sparkles className="mt-0.5 size-3.5 shrink-0 text-brand-600" />
         <span>
-          근거: {kind === "견적서" ? priceRule?.title : termsRule?.title} (회사 기준·회사 자료), 이 프로젝트 핵심 정보 {conditions.length}개
+          근거: {kind === "견적서" ? priceRule?.title : termsRule?.title} (회사 기준·회사 자료), 이 스페이스 핵심 정보 {conditions.length}개
           {monday?.amount ? ", 먼데이 예상 금액" : ""}
         </span>
       </p>

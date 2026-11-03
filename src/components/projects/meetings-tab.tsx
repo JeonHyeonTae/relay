@@ -14,7 +14,7 @@ import type { Meeting } from "@/lib/types";
 import { DueLabel } from "./monday";
 
 /**
- * 프로젝트 회의: 회의록을 올리거나 노트테이커(2차 서비스) 녹음이 들어오면 AI가 요약·정한 것·할 일을 뽑고
+ * 스페이스 회의: 회의록을 올리거나 노트테이커(2차 서비스) 녹음이 들어오면 AI가 요약·정한 것·할 일을 뽑고
  * 후속 메일 초안까지 만든다. 할 일은 먼데이 업무로 보낼 수 있다
  */
 export function MeetingsTab({ projectId, onOpenDoc }: { projectId: string; onOpenDoc: (docId: string) => void }) {
@@ -150,7 +150,7 @@ function FollowUpDialog({ meeting, onClose }: { meeting: Meeting; onClose: () =>
           <Button
             variant="primary"
             onClick={() => {
-              notify("후속 메일을 보냈어요. 이 프로젝트 메일 대화에 기록돼요.");
+              notify("후속 메일을 보냈어요. 이 스페이스 메일 대화에 기록돼요.");
               logActivity(`'${meeting.title}' 후속 메일 발송`);
               onClose();
             }}

@@ -20,7 +20,7 @@ interface Result {
 
 const LIMIT = 5;
 
-/** 프로젝트·고객사·대화·문서를 한 번에 찾는 검색 창 (Ctrl+K) */
+/** 스페이스·고객사·대화·문서를 한 번에 찾는 검색 창 (Ctrl+K) */
 export function SearchPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const { accounts, projects, threads, docs, currentUser, role } = useDemo();
@@ -63,11 +63,11 @@ export function SearchPalette({ onClose }: { onClose: () => void }) {
         .slice(0, LIMIT)
         .map((p) => ({
           key: `p-${p.id}`,
-          group: "프로젝트",
+          group: "스페이스",
           icon: <FolderKanban className="size-4" />,
           title: p.name,
           sub: `${accountName(p.accountId)} · ${p.status}`,
-          href: `/projects/${p.id}`,
+          href: `/spaces/${p.id}`,
         })),
       ...visible
         .filter((t) => hit(t.title, ...t.messages.flatMap((m) => [m.body, m.authorName])))
@@ -125,7 +125,7 @@ export function SearchPalette({ onClose }: { onClose: () => void }) {
               setActive(0);
             }}
             onKeyDown={onKeyDown}
-            placeholder="회사, 프로젝트, 대화 내용, 문서 이름으로 검색"
+            placeholder="회사, 스페이스, 대화 내용, 문서 이름으로 검색"
             className="h-12 flex-1 bg-transparent text-sm outline-none"
           />
           <kbd className="rounded border border-slate-200 px-1.5 py-0.5 text-xs text-slate-400">Esc</kbd>

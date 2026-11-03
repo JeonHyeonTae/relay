@@ -55,7 +55,7 @@ export function ConversationPanel({
   // 이 대화가 들어온 계정. 답장도 이 계정으로 나간다
   const via = channelAccounts.find((a) => a.id === thread.via);
   const linked = thread.projectIds.map((id) => projects.find((p) => p.id === id)).filter((p) => p !== undefined);
-  // 여러 프로젝트에 연결했거나 개인 대화가 섞인 방은 메시지마다 쌓이는 곳을 붙인다
+  // 여러 스페이스에 연결했거나 개인 대화가 섞인 방은 메시지마다 쌓이는 곳을 붙인다
   const showTags = needsTags(thread);
   const aiOn = thread.aiReply !== false;
   // 열자마자 읽음 처리되므로, 연 순간의 안 읽은 수와 그때의 메시지 수를 기억해 둔다
@@ -124,7 +124,7 @@ export function ConversationPanel({
           <span className="font-medium">{roomName(backTo, currentUser.id)}</span> 대화로 돌아가기
         </button>
       )}
-      {/* 목록과 같은 채팅방 이름을 크게, 회사·프로젝트는 작게. 사람은 채팅방이 아니라 프로젝트 참여자로 관리한다 */}
+      {/* 목록과 같은 채팅방 이름을 크게, 회사·스페이스는 작게. 사람은 채팅방이 아니라 스페이스 참여자로 관리한다 */}
       <header className="border-b border-slate-200 bg-white px-6 py-3">
         <div className="flex items-center gap-2">
           <ChannelBadge channel={thread.channel} />
@@ -182,13 +182,13 @@ export function ConversationPanel({
           </Link>
           <span>›</span>
           {linked.length === 0 ? (
-            <span className="text-slate-400">연결한 프로젝트 없음 · 이 방의 대화는 쌓이지 않아요</span>
+            <span className="text-slate-400">연결한 스페이스 없음 · 이 방의 대화는 쌓이지 않아요</span>
           ) : (
             linked.map((p, i) => (
               <Fragment key={p.id}>
                 {i > 0 && <span className="text-slate-300">·</span>}
                 <Link
-                  href={`/projects/${p.id}?from=${thread.id}`}
+                  href={`/spaces/${p.id}?from=${thread.id}`}
                   onClick={() => keepThreadInHistory(thread.id)}
                   className="hover:text-brand-600 hover:underline"
                 >

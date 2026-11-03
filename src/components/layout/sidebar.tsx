@@ -10,7 +10,7 @@ import { useDemo, visibleThreads } from "@/lib/demo-context";
 const NAV = [
   { href: "/today", label: "오늘 할 일", icon: ListChecks },
   { href: "/inbox", label: "통합 수신함", icon: Inbox },
-  { href: "/projects", label: "프로젝트", icon: FolderKanban },
+  { href: "/spaces", label: "스페이스", icon: FolderKanban },
   { href: "/clients", label: "고객사", icon: Building2 },
   { href: "/knowledge", label: "지식 베이스", icon: BookOpen },
   { href: "/channels", label: "채널 연동", icon: Plug },

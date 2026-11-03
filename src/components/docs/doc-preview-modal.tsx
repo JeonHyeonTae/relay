@@ -54,7 +54,7 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
         {project && (
           <>
             <span>·</span>
-            <Link href={`/projects/${project.id}`} className="text-brand-600 hover:underline" onClick={onClose}>
+            <Link href={`/spaces/${project.id}`} className="text-brand-600 hover:underline" onClick={onClose}>
               {project.name}
             </Link>
           </>
@@ -99,7 +99,7 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
           <Building2 className="size-4 shrink-0 text-brand-600" />
           <p className="min-w-0 flex-1">
             <span className="font-medium">{account.name} 공통 자료예요</span>
-            <span className="block text-xs text-slate-500">{account.name}의 모든 프로젝트 답장에 참고해요. 다른 회사 답장에는 쓰지 않아요.</span>
+            <span className="block text-xs text-slate-500">{account.name}의 모든 스페이스 답장에 참고해요. 다른 회사 답장에는 쓰지 않아요.</span>
           </p>
         </div>
       )}

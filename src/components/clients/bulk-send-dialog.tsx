@@ -23,7 +23,7 @@ interface Draft {
 
 /**
  * 여러 고객사에 한 번에 보내기: 상황(공지·정기 일정·계약 갱신)을 고르면 대상과 문구가 채워지고,
- * 회사마다 이름·프로젝트·맞춤 한 줄을 넣어 하나씩 확인한 뒤 보낸다
+ * 회사마다 이름·스페이스·맞춤 한 줄을 넣어 하나씩 확인한 뒤 보낸다
  */
 export function BulkSendDialog({ initialScenario = "notice", onClose }: { initialScenario?: ScenarioKey; onClose: () => void }) {
   const { accounts, projects, notify, logActivity } = useDemo();
@@ -48,7 +48,7 @@ export function BulkSendDialog({ initialScenario = "notice", onClose }: { initia
   const toggleTarget = (id: string) => setTargets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const fill = (text: string, account: Account, project: Project | undefined, name: string) =>
-    text.replaceAll("{회사}", account.name).replaceAll("{이름}", name).replaceAll("{프로젝트}", project?.name ?? "진행 중인 일");
+    text.replaceAll("{회사}", account.name).replaceAll("{이름}", name).replaceAll("{스페이스}", project?.name ?? "진행 중인 일");
 
   const makeDrafts = () => {
     setDrafts(
@@ -157,7 +157,7 @@ export function BulkSendDialog({ initialScenario = "notice", onClose }: { initia
           <Field label="제목">
             <input value={subject} onChange={(e) => setSubject(e.target.value)} className={inputClass} />
           </Field>
-          <Field label="내용" hint="{회사}, {이름}, {프로젝트}는 회사마다 알맞은 값으로 바뀌어요.">
+          <Field label="내용" hint="{회사}, {이름}, {스페이스}는 회사마다 알맞은 값으로 바뀌어요.">
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -173,7 +173,7 @@ export function BulkSendDialog({ initialScenario = "notice", onClose }: { initia
                 {scenarioKey === "notice" && "진행 중인 견적은 기존 단가로 유지된다는 안내를 회사마다 넣어요."}
                 {scenarioKey === "maintenance" && "먼데이에서 진행 중인 점검 업무를 회사마다 넣어요."}
                 {scenarioKey === "renewal" && "현재 계약 금액을 회사마다 넣어요."}
-                {scenarioKey === "custom" && "진행 중인 프로젝트를 회사마다 넣어요."}
+                {scenarioKey === "custom" && "진행 중인 스페이스를 회사마다 넣어요."}
               </span>
             </span>
           </label>
@@ -202,7 +202,7 @@ export function BulkSendDialog({ initialScenario = "notice", onClose }: { initia
                 ) : (
                   <span className="inline-flex items-center gap-1 text-xs text-amber-700">
                     <TriangleAlert className="size-3.5" />
-                    메일 주소가 없어요. 프로젝트 화면의 고객사 연락처에서 추가해 주세요.
+                    메일 주소가 없어요. 스페이스 화면의 고객사 연락처에서 추가해 주세요.
                   </span>
                 )}
                 {d.project && (

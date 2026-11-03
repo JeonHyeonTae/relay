@@ -115,7 +115,7 @@ function TeamSettingsPanel() {
     { target: "팀 공유 채널의 연락 보기", member: true },
     { target: "자료 원본 내려받기", member: team.downloadScope === "all" },
     { target: "회사 기준 정하기", member: false },
-    { target: "팀 설정 바꾸기·프로젝트 넘기기", member: false },
+    { target: "팀 설정 바꾸기·스페이스 넘기기", member: false },
   ];
 
   return (
@@ -148,7 +148,7 @@ function TeamSettingsPanel() {
                       {s.note && <Badge className="bg-amber-100 text-amber-800">{s.note}</Badge>}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {s.title} · {s.team} · 참여 중인 프로젝트 {active.length}개
+                      {s.title} · {s.team} · 참여 중인 스페이스 {active.length}개
                     </p>
                   </div>
                   <select
@@ -173,7 +173,7 @@ function TeamSettingsPanel() {
             })}
           </ul>
           <p className="mt-3 text-xs text-slate-500">
-            &ldquo;넘기기&rdquo;는 퇴사·이동하는 사람의 진행 중 프로젝트를 한 번에 다른 사람에게 넘겨요.
+            &ldquo;넘기기&rdquo;는 퇴사·이동하는 사람의 진행 중 스페이스를 한 번에 다른 사람에게 넘겨요.
           </p>
         </Card>
 
@@ -283,8 +283,8 @@ function TeamSettingsPanel() {
               </p>
               <p className="text-xs text-slate-500">
                 {team.mondayConnected
-                  ? `프로젝트 ${MONDAY_ITEMS.length}개와 연결 · ${formatDateTime(MONDAY_SYNCED_AT)} 동기화`
-                  : "연결하면 진행 단계·마감·업무를 프로젝트에서 함께 봐요"}
+                  ? `스페이스 ${MONDAY_ITEMS.length}개와 연결 · ${formatDateTime(MONDAY_SYNCED_AT)} 동기화`
+                  : "연결하면 진행 단계·마감·업무를 스페이스에서 함께 봐요"}
               </p>
             </div>
             {team.mondayConnected && (
@@ -312,12 +312,12 @@ function TeamSettingsPanel() {
             </div>
           )}
           <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
-            <span>프로젝트 하나 = 먼데이 아이템 하나. 고칠 때는 먼데이에서 바꿔요.</span>
+            <span>스페이스 하나 = 먼데이 아이템 하나. 고칠 때는 먼데이에서 바꿔요.</span>
             <button
               type="button"
               onClick={() => {
                 change({ mondayConnected: !team.mondayConnected }, team.mondayConnected ? "먼데이 연결 해제" : "먼데이 연결");
-                notify(team.mondayConnected ? "먼데이 연결을 끊었어요. (데모에서는 프로젝트 화면은 그대로예요)" : "먼데이를 연결했어요.");
+                notify(team.mondayConnected ? "먼데이 연결을 끊었어요. (데모에서는 스페이스 화면은 그대로예요)" : "먼데이를 연결했어요.");
               }}
               className={cn("shrink-0 hover:underline", team.mondayConnected ? "text-rose-600" : "text-brand-600")}
             >

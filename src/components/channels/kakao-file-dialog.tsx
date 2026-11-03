@@ -56,7 +56,7 @@ export function KakaoFileDialog({ open, onClose }: { open: boolean; onClose: () 
           ))}
         </select>
       </Field>
-      <Field label="프로젝트">
+      <Field label="스페이스">
         <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className={inputClass}>
           {accountProjects.map((p) => (
             <option key={p.id} value={p.id}>

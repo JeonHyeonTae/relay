@@ -23,7 +23,7 @@ export interface DraftSuggestion {
 /** 초안 생성 → 사람이 확인·수정 → 승인 후 발송 (기능정리 2-2, 2-4, 2-5, 2-6).
     AI 초안이 있든 없든 같은 입력칸을 쓰고, 초안이 있으면 위에 한 줄만 붙인다.
     aiOn이 꺼진 채팅방은 AI 초안 없이 직접 쓴다.
-    보낼 때마다 이 메시지를 어느 프로젝트 대화로 쌓을지(여러 곳 가능), 개인 대화로 쌓지 않을지 고른다 */
+    보낼 때마다 이 메시지를 어느 스페이스 대화로 쌓을지(여러 곳 가능), 개인 대화로 쌓지 않을지 고른다 */
 export function DraftReply({ thread, aiOn, suggestion }: { thread: Thread; aiOn: boolean; suggestion?: DraftSuggestion }) {
   const { sendReply, notify, docs, threads, projects, channelAccounts, currentUser, logActivity, sendModeOf, prefs } = useDemo();
   // 사용자가 고른 과거 건 초안이 먼저, 없으면 AI가 미리 써 둔 초안
@@ -32,7 +32,7 @@ export function DraftReply({ thread, aiOn, suggestion }: { thread: Thread; aiOn:
   const [base, setBase] = useState<string | null>(aiBase?.text ?? null);
   const [text, setText] = useState(aiBase?.text ?? "");
   const [showSources, setShowSources] = useState(false);
-  // 처음에는 마지막 메시지가 쌓인 곳. 받은 메시지에 AI가 프로젝트를 여럿 붙였으면 모두 골라 둔다.
+  // 처음에는 마지막 메시지가 쌓인 곳. 받은 메시지에 AI가 스페이스를 여럿 붙였으면 모두 골라 둔다.
   // 보낸 뒤에도 그대로 둬서 같은 얘기를 이어 쓰기 쉽게
   const [tags, setTags] = useState(() => defaultTags(thread));
   const linked = thread.projectIds.map((id) => projects.find((p) => p.id === id)).filter((p) => p !== undefined);
@@ -142,7 +142,7 @@ export function DraftReply({ thread, aiOn, suggestion }: { thread: Thread; aiOn:
         {linked.length > 0 ? (
           <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
             <span className="shrink-0">쌓을 곳</span>
-            {/* 연결한 프로젝트가 세 개까지는 칩으로 바로 켜고 끄고, 더 많으면 메뉴로 고른다 */}
+            {/* 연결한 스페이스가 세 개까지는 칩으로 바로 켜고 끄고, 더 많으면 메뉴로 고른다 */}
             {linked.length <= 3 ? (
               <TagToggles thread={thread} tags={tags} onChange={setTags} />
             ) : (
@@ -159,7 +159,7 @@ export function DraftReply({ thread, aiOn, suggestion }: { thread: Thread; aiOn:
             )}
           </div>
         ) : (
-          <span className="text-xs text-slate-400">연결한 프로젝트가 없어 개인 대화로 남아요</span>
+          <span className="text-xs text-slate-400">연결한 스페이스가 없어 개인 대화로 남아요</span>
         )}
         {mode === "draft" ? (
           <span className="min-w-0 text-xs text-slate-500">

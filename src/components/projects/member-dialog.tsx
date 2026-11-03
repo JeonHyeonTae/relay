@@ -17,7 +17,7 @@ interface MemberDialogProps {
   onReplaced?: (fromName: string, toName: string) => void;
 }
 
-/** 프로젝트 참여자 추가·교체. 사람이 바뀌어도 대화·문서는 프로젝트에 그대로 남는다 (기능정리 3-3) */
+/** 스페이스 참여자 추가·교체. 사람이 바뀌어도 대화·문서는 스페이스에 그대로 남는다 (기능정리 3-3) */
 export function MemberDialog({ open, onClose, project, replacing, onReplaced }: MemberDialogProps) {
   const { addMember, replaceMember, notify, logActivity } = useDemo();
   const candidates = STAFF.filter((s) => !project.memberIds.includes(s.id));
@@ -45,8 +45,8 @@ export function MemberDialog({ open, onClose, project, replacing, onReplaced }: 
       title={replacing ? `${findStaff(replacing).name}님 교체` : "참여자 추가"}
       description={
         replacing
-          ? "대화·문서·약속은 프로젝트에 그대로 남고, 맡던 대화는 새 사람에게 넘어가요. 새 사람은 개요의 요약과 지금 할 일로 바로 시작할 수 있어요."
-          : "추가한 사람은 이 프로젝트의 대화와 문서를 함께 봐요."
+          ? "대화·문서·약속은 스페이스에 그대로 남고, 맡던 대화는 새 사람에게 넘어가요. 새 사람은 개요의 요약과 지금 할 일로 바로 시작할 수 있어요."
+          : "추가한 사람은 이 스페이스의 대화와 문서를 함께 봐요."
       }
       footer={
         <>

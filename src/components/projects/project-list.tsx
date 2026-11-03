@@ -75,9 +75,9 @@ export function ProjectList() {
   const mine = projects.filter((p) => p.memberIds.includes(currentUser.id));
   const scopes: { value: Scope; label: string; count: number }[] = [
     { value: "all", label: "전체", count: projects.length },
-    { value: "mine", label: "내 프로젝트", count: mine.length },
+    { value: "mine", label: "내 스페이스", count: mine.length },
   ];
-  // 프로젝트 이름이나 고객사 이름으로 찾는다
+  // 스페이스 이름이나 고객사 이름으로 찾는다
   const q = query.trim().toLowerCase();
   const list = (scope === "mine" ? mine : projects).filter(
     (p) => !q || [p.name, accountName(p.accountId)].some((t) => t.toLowerCase().includes(q)),
@@ -129,11 +129,11 @@ export function ProjectList() {
   return (
     <div className="pb-10">
       <PageHeader
-        title="프로젝트"
-        description="프로젝트마다 문서·핵심 정보·소통 내역이 쌓이고, AI는 이 자산을 근거로 답장을 만듭니다."
+        title="스페이스"
+        description="스페이스마다 문서·핵심 정보·소통 내역이 쌓이고, AI는 이 자산을 근거로 답장을 만듭니다."
         actions={
           <Button variant="primary" onClick={() => setCreating(true)}>
-            <Plus className="size-4" />새 프로젝트
+            <Plus className="size-4" />새 스페이스
           </Button>
         }
       />
@@ -154,7 +154,7 @@ export function ProjectList() {
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
-          <SearchInput value={query} onChange={setQuery} placeholder="프로젝트·고객사 이름 검색" />
+          <SearchInput value={query} onChange={setQuery} placeholder="스페이스·고객사 이름 검색" />
           <ColumnPicker
             columns={COLUMNS.map((c) => ({ ...c, hint: c.monday && <MondayDot /> }))}
             shown={shown}
@@ -171,14 +171,14 @@ export function ProjectList() {
 
       {list.length === 0 ? (
         <p className="mx-8 rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
-          {q ? "검색에 맞는 프로젝트가 없어요." : "참여 중인 프로젝트가 없어요. 전체에서 찾아보세요."}
+          {q ? "검색에 맞는 스페이스가 없어요." : "참여 중인 스페이스가 없어요. 전체에서 찾아보세요."}
         </p>
       ) : (
         <div className="mx-8 overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs whitespace-nowrap text-slate-500">
               <tr>
-                <th className="px-4 py-2.5 font-medium">프로젝트</th>
+                <th className="px-4 py-2.5 font-medium">스페이스</th>
                 {columns.map((c) => (
                   <th key={c.key} className="px-4 py-2.5 font-medium" title={c.monday ? "먼데이에서 받아온 칼럼" : undefined}>
                     <span className="inline-flex items-center gap-1.5">
@@ -193,12 +193,12 @@ export function ProjectList() {
               {list.map((project) => (
                 <tr
                   key={project.id}
-                  onClick={() => router.push(`/projects/${project.id}`)}
+                  onClick={() => router.push(`/spaces/${project.id}`)}
                   className="cursor-pointer border-t border-slate-100 hover:bg-slate-50"
                 >
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link
-                      href={`/projects/${project.id}`}
+                      href={`/spaces/${project.id}`}
                       onClick={(e) => e.stopPropagation()}
                       className="font-medium hover:text-brand-600"
                     >

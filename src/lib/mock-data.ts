@@ -105,7 +105,7 @@ export const PROJECTS: Project[] = [
   { id: "p4", accountId: "a3", name: "원심분리기 정기점검", status: "진행 중", channels: ["channeltalk", "gchat"], memberIds: ["s1", "s4"] },
   { id: "p5", accountId: "a4", name: "주문 API 연동", status: "진행 중", channels: ["teams", "email"], memberIds: ["s1", "s4"] },
   { id: "p6", accountId: "a5", name: "동남아 리셀러 계약", status: "진행 중", channels: ["whatsapp", "email"], memberIds: ["s2"] },
-  // 비슷한 과거 건이 나온 지난 프로젝트
+  // 비슷한 과거 건이 나온 지난 스페이스
   { id: "p7", accountId: "a1", name: "1공장 검사장비 납품", status: "완료", channels: ["email", "kakao"], memberIds: ["s3"] },
   { id: "p8", accountId: "a6", name: "라인 증설 검사장비 납품", status: "완료", channels: ["email"], memberIds: ["s2"] },
   { id: "p9", accountId: "a7", name: "WMS 연동 PoC", status: "완료", channels: ["slack"], memberIds: ["s3", "s4"] },
@@ -417,7 +417,7 @@ export const THREADS: Thread[] = [
   {
     id: "t9",
     accountId: "a4",
-    // 한 단체방에서 주문 API 연동과 반품 API 추가 개발 얘기를 함께 한다. 메시지마다 어느 프로젝트 얘기인지 붙는다
+    // 한 단체방에서 주문 API 연동과 반품 API 추가 개발 얘기를 함께 한다. 메시지마다 어느 스페이스 얘기인지 붙는다
     projectIds: ["p5", "p12"],
     channel: "teams",
     via: "ca-teams",
@@ -461,7 +461,7 @@ export const THREADS: Thread[] = [
         authorName: "장하늘 매니저",
         body: "@박서연 매니저님, 추가 비용이 드는지 알려 주시면 내부 품의 올리겠습니다. 품의에 반품 API 견적도 같이 넣으려고 하는데, 이번 주 안에 받을 수 있을까요?",
         at: "2026-10-29T14:31:00+09:00",
-        // 한 메시지에 두 프로젝트 얘기가 섞여 AI가 둘 다 붙였다
+        // 한 메시지에 두 스페이스 얘기가 섞여 AI가 둘 다 붙였다
         projectIds: ["p5", "p12"],
       },
     ],
@@ -724,7 +724,7 @@ export const THREADS: Thread[] = [
       },
     ],
   },
-  // 고객사 사람이지만 대학 동기라 사적인 대화도 오가는 1:1 채팅. 아직 어느 프로젝트에도 연결하지 않았다
+  // 고객사 사람이지만 대학 동기라 사적인 대화도 오가는 1:1 채팅. 아직 어느 스페이스에도 연결하지 않았다
   {
     id: "t17",
     accountId: "a4",
@@ -899,7 +899,7 @@ export const HANDOVERS: HandoverBrief[] = [
     openIssues: ["리셀러 마진표 수정본 전달"],
     promises: ["금요일 통화 (김지훈)"],
   },
-  // 끝난 프로젝트: 어떻게 마무리했는지만 남는다
+  // 끝난 스페이스: 어떻게 마무리했는지만 남는다
   {
     projectId: "p7",
     summary: "1공장 비전 검사장비 1대를 납품했다. 납기를 2주 당겨 달라는 요청에 본체를 먼저 설치하고 검사 모듈은 2주 뒤 설치하는 두 단계로 대응했다.",
@@ -939,7 +939,7 @@ export const HANDOVERS: HandoverBrief[] = [
 ];
 
 export const DOCS: KnowledgeDoc[] = [
-  // 회사 공통 지식: 모든 프로젝트의 답장에 함께 쓰인다
+  // 회사 공통 지식: 모든 스페이스의 답장에 함께 쓰인다
   {
     id: "k1",
     title: "영업 매뉴얼 v3",
@@ -1023,7 +1023,7 @@ export const DOCS: KnowledgeDoc[] = [
     highlights: ["정기점검 연 2회", "장애 접수 후 48시간 안에 방문", "단가 조정은 갱신 30일 전까지 협의"],
   },
 
-  // 고객사 공통 문서: 그 회사 모든 프로젝트 답장에 참고
+  // 고객사 공통 문서: 그 회사 모든 스페이스 답장에 참고
   {
     id: "k7",
     title: "한빛정밀 협력업체 출입·안전 수칙",
@@ -1085,11 +1085,11 @@ export const DOCS: KnowledgeDoc[] = [
     highlights: ["독점 지역: 베트남·태국", "기술 지원 1차는 오름테크, 2차는 릴레이", "분기마다 판매 실적 공유"],
   },
 
-  // 프로젝트 문서
+  // 스페이스 문서
   {
     id: "d1",
     title: "2공장 도입 제안서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "제안서",
     source: "upload",
     projectId: "p1",
@@ -1103,7 +1103,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d2",
     title: "VX-500 견적서 v2",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "견적서",
     source: "email",
     projectId: "p1",
@@ -1117,7 +1117,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d3",
     title: "2공장 3번 라인 배치도",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "사양서",
     source: "email",
     projectId: "p1",
@@ -1131,7 +1131,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d4",
     title: "킥오프 회의록 (9/30)",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "회의록",
     source: "upload",
     projectId: "p1",
@@ -1145,7 +1145,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d5",
     title: "2026 유지보수 계약서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "계약서",
     source: "upload",
     projectId: "p2",
@@ -1159,7 +1159,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d6",
     title: "PoC 범위 정의서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "사양서",
     source: "email",
     projectId: "p3",
@@ -1173,7 +1173,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d7",
     title: "WMS API 명세서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "사양서",
     source: "slack",
     projectId: "p3",
@@ -1187,7 +1187,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d8",
     title: "2025 정기점검 보고서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "보고서",
     source: "channeltalk",
     projectId: "p4",
@@ -1201,7 +1201,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d9",
     title: "정기점검 연간 계약서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "계약서",
     source: "upload",
     projectId: "p4",
@@ -1215,7 +1215,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d10",
     title: "주문 API 연동 명세서",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "사양서",
     source: "email",
     projectId: "p5",
@@ -1233,7 +1233,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d11",
     title: "Reseller margin table v1",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "견적서",
     source: "whatsapp",
     projectId: "p6",
@@ -1247,7 +1247,7 @@ export const DOCS: KnowledgeDoc[] = [
   {
     id: "d12",
     title: "Reseller agreement draft",
-    category: "프로젝트",
+    category: "스페이스",
     kind: "계약서",
     source: "email",
     projectId: "p6",
@@ -1263,7 +1263,7 @@ export const DOCS: KnowledgeDoc[] = [
 /** 먼데이에서 마지막으로 받아온 때 */
 export const MONDAY_SYNCED_AT = "2026-10-29T17:55:00+09:00";
 
-/** 먼데이 보드에서 받아온 프로젝트 업무 현황. 끝난 프로젝트는 하위 업무가 모두 완료, 진행률 100% */
+/** 먼데이 보드에서 받아온 스페이스 업무 현황. 끝난 스페이스는 하위 업무가 모두 완료, 진행률 100% */
 export const MONDAY_ITEMS: MondayItem[] = [
   {
     projectId: "p1",
@@ -1433,7 +1433,7 @@ export const PROJECT_FACTS: ProjectFact[] = [
   { id: "f20", projectId: "p6", label: "다음 일정", value: "금요일 통화", threadId: "t6" },
 ];
 
-/** 견적서 초안에 쓰는 품목(만원). 회사 기준의 단가표와 프로젝트 핵심 정보를 바탕으로 AI가 만든 것으로 본다 */
+/** 견적서 초안에 쓰는 품목(만원). 회사 기준의 단가표와 스페이스 핵심 정보를 바탕으로 AI가 만든 것으로 본다 */
 export const QUOTE_ITEMS: Record<string, { name: string; qty: string; price: number }[]> = {
   p1: [
     { name: "VX-500 비전 검사장비", qty: "1대", price: 2200 },
@@ -1449,7 +1449,7 @@ export const QUOTE_ITEMS: Record<string, { name: string; qty: string; price: num
   p6: [{ name: "리셀러 공급 (기본 마진 20%)", qty: "10대", price: 3000 }],
 };
 
-/** 프로젝트 회의 */
+/** 스페이스 회의 */
 export const MEETINGS: Meeting[] = [
   {
     id: "m1",
@@ -1522,7 +1522,7 @@ export const CREDITS = {
   personal: { used: 640, total: 2000 },
   usage: [
     { label: "AI 답장 초안", amount: 2180 },
-    { label: "프로젝트 요약·안 읽은 내용 요약", amount: 760 },
+    { label: "스페이스 요약·안 읽은 내용 요약", amount: 760 },
     { label: "비슷한 과거 건", amount: 330 },
     { label: "카톡 대화 파일 업로드", amount: 150 },
   ],

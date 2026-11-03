@@ -16,7 +16,7 @@ import { KnowledgeTree, type Scope } from "./knowledge-tree";
 import { AccountPanel, CompanyPanel, ProjectPanel } from "./scope-panels";
 
 /**
- * 지식 베이스: AI가 답장할 때 참고하는 자료를 우리 회사 → 고객사 → 프로젝트 구조로 정리해 보는 곳.
+ * 지식 베이스: AI가 답장할 때 참고하는 자료를 우리 회사 → 고객사 → 스페이스 구조로 정리해 보는 곳.
  * 이 구조가 곧 AI가 자료를 찾는 범위다. 자료가 틀리면 AI 답장도 틀린다
  */
 export function KnowledgeView() {
@@ -39,7 +39,7 @@ export function KnowledgeView() {
 
   const stale = docs.filter((d) => isStale(d, team.staleMonths));
   const q = query.trim().toLowerCase();
-  // 검색과 최신화가 필요한 자료는 회사·프로젝트를 가리지 않고 모아 본다
+  // 검색과 최신화가 필요한 자료는 회사·스페이스를 가리지 않고 모아 본다
   const finding = q !== "" || staleOnly;
   const found = docs
     .filter((d) => !staleOnly || isStale(d, team.staleMonths))
@@ -64,7 +64,7 @@ export function KnowledgeView() {
     <div className="space-y-5 pb-10">
       <PageHeader
         title="지식 베이스"
-        description="AI가 답장할 때 참고하는 자료를 회사·프로젝트별로 정리해 둔 곳이에요. 자료가 틀리거나 오래되면 AI 답장도 틀려요."
+        description="AI가 답장할 때 참고하는 자료를 회사·스페이스별로 정리해 둔 곳이에요. 자료가 틀리거나 오래되면 AI 답장도 틀려요."
         actions={
           <Button variant="primary" onClick={() => setUploading(true)}>
             <Upload className="size-4" />
@@ -109,7 +109,7 @@ export function KnowledgeView() {
               <p className="text-xs text-slate-500">
                 {staleOnly
                   ? "“최신화 요청”을 누르면 자료를 올린 사람에게 알림이 가요."
-                  : "회사 자료와 모든 프로젝트 자료에서 찾았어요. 프로젝트 자료는 프로젝트 이름이 함께 보여요."}
+                  : "회사 자료와 모든 스페이스 자료에서 찾았어요. 스페이스 자료는 스페이스 이름이 함께 보여요."}
               </p>
               <DocTable docs={found} onOpen={setOpenDocId} showProject />
             </section>
@@ -123,7 +123,7 @@ export function KnowledgeView() {
         </div>
       </div>
 
-      {/* 프로젝트를 보고 있으면 그 프로젝트 자료로, 회사를 보고 있으면 그 회사 공통 자료로 올린다 */}
+      {/* 스페이스를 보고 있으면 그 스페이스 자료로, 회사를 보고 있으면 그 회사 공통 자료로 올린다 */}
       <UploadDialog
         key={scope.kind === "company" ? "company" : scope.id}
         open={uploading}

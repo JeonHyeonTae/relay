@@ -14,7 +14,7 @@ import type { KnowledgeDoc } from "@/lib/types";
 interface DocTableProps {
   docs: KnowledgeDoc[];
   onOpen: (docId: string) => void;
-  /** 지식 베이스처럼 여러 프로젝트 문서가 섞일 때 프로젝트 이름(고객사 공통 자료는 회사 이름)을 함께 보여준다 */
+  /** 지식 베이스처럼 여러 스페이스 문서가 섞일 때 스페이스 이름(고객사 공통 자료는 회사 이름)을 함께 보여준다 */
   showProject?: boolean;
 }
 
