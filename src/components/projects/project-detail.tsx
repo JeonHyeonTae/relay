@@ -33,7 +33,7 @@ import { ChannelBadge } from "@/components/common/channel-badge";
 import { CommunicationTimeline } from "@/components/common/communication-timeline";
 import { ProjectStatusBadge } from "@/components/common/project-status-badge";
 import { DocPreviewModal } from "@/components/docs/doc-preview-modal";
-import { DocTable } from "@/components/docs/doc-table";
+import { DocList } from "@/components/docs/doc-list";
 import { UploadDialog } from "@/components/docs/upload-dialog";
 import { ThreadList } from "@/components/inbox/thread-list";
 import { Avatar } from "@/components/ui/avatar";
@@ -380,7 +380,7 @@ export function ProjectDetail({ id }: { id: string }) {
 
           {tab === "docs" && (
             <>
-              <DocTable docs={projectDocs} onOpen={setOpenDocId} />
+              <DocList docs={projectDocs} onOpen={setOpenDocId} />
               <p className="text-xs text-slate-500">메일·메신저로 주고받은 첨부파일은 자동으로 이 스페이스 문서에 저장됩니다.</p>
             </>
           )}

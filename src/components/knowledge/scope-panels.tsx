@@ -6,15 +6,17 @@ import {
   ChevronRight,
   ExternalLink,
   FolderKanban,
+  Lightbulb,
   MessagesSquare,
   ShieldCheck,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { ChannelBadge } from "@/components/common/channel-badge";
 import { ProjectStatusBadge } from "@/components/common/project-status-badge";
-import { DocTable } from "@/components/docs/doc-table";
+import { DocList } from "@/components/docs/doc-list";
 import { Badge } from "@/components/ui/badge";
 import { inputClass } from "@/components/ui/field";
 import { cn } from "@/lib/cn";
@@ -22,7 +24,7 @@ import { useDemo, visibleThreads } from "@/lib/demo-context";
 import { docLayer } from "@/lib/docs";
 import { PROJECT_FACTS, SIMILAR_CASES } from "@/lib/mock-data";
 import { messageTags, roomName } from "@/lib/thread";
-import type { KnowledgeDoc, Project } from "@/lib/types";
+import type { Project } from "@/lib/types";
 import type { Scope } from "./knowledge-tree";
 
 export const RANGES = [
@@ -34,27 +36,31 @@ export const RANGES = [
 
 const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대기: 1, 완료: 2 };
 
-const recent = (a: KnowledgeDoc, b: KnowledgeDoc) => b.updatedAt.localeCompare(a.updatedAt);
-
 interface PanelProps {
   range: string;
   onSelect: (scope: Scope) => void;
   onOpenDoc: (docId: string) => void;
 }
 
-/** 우리 회사: 모든 답장에 공통으로 쓰는 회사 기준·회사 자료, 대화에서 배워 회사 전체에서 쓰는 지식 */
+type CompanyTab = "standard" | "company" | "learned";
+
+/**
+ * 우리 회사: AI가 자료를 쓰는 법, 그리고 탭으로 회사 기준 / 회사 자료 / 대화에서 배운 것.
+ * 섹션을 위아래로 쌓으면 자료가 늘수록 화면이 끝없이 길어져서 탭으로 나눈다
+ */
 export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: PanelProps & { onRangeChange: (range: string) => void }) {
   const { docs, threads, projects, accounts, currentUser, role, learnedEdits } = useDemo();
+  const [tab, setTab] = useState<CompanyTab>("standard");
   const readable = visibleThreads(threads, currentUser, role);
   const canOpen = (threadId?: string) => Boolean(threadId && readable.some((t) => t.id === threadId));
-  const standard = docs.filter((d) => docLayer(d) === "standard").sort(recent);
-  const company = docs.filter((d) => docLayer(d) === "company").sort(recent);
+  const standard = docs.filter((d) => docLayer(d) === "standard");
+  const company = docs.filter((d) => docLayer(d) === "company");
   const accountDocs = docs.filter((d) => docLayer(d) === "account").length;
   // 대화는 스페이스에 연결한 채팅방만 쌓인다
   const linkedChats = readable.filter((t) => t.projectIds.length > 0).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <ScopeHeader crumbs={[]} title="우리 회사" sub="모든 고객사 답장에 공통으로 쓰는 자료와 지식이에요." />
       <HowAiAnswers
         rules={standard.length}
@@ -64,82 +70,101 @@ export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: Pane
           { label: "회사 자료", detail: `${company.length}개` },
         ]}
       />
-      <Section
-        icon={ShieldCheck}
-        title="회사 기준"
-        count={standard.length}
-        desc="말투, 응대 원칙, 할인·승인 규칙처럼 모든 답장이 지켜야 하는 규칙이에요. 단가처럼 고객사마다 달라질 수 있는 건 회사 자료로 둬요. 팀장이 정해요."
-      >
-        <DocTable docs={standard} onOpen={onOpenDoc} />
-      </Section>
-      <Section
-        icon={BookOpen}
-        title="회사 자료"
-        count={company.length}
-        desc="단가표, 제품 소개서, 정비 가이드처럼 질문에 맞을 때 참고해요. 고객사·스페이스에 더 구체적인 자료가 있으면 그쪽을 따라요."
-      >
-        <DocTable docs={company} onOpen={onOpenDoc} />
-      </Section>
-      <Section icon={MessagesSquare} title="대화에서 배운 것" desc="스페이스 대화에서 AI가 뽑아 회사 전체에서 쓰는 지식이에요.">
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Card title={`해결된 사례 ${SIMILAR_CASES.length}`} desc="끝난 대화에서 뽑은 문제와 해결 방법이에요. 비슷한 문의가 오면 다른 고객사 건에도 추천돼요.">
-            <ul className="divide-y divide-slate-100">
-              {SIMILAR_CASES.map((c) => {
-                const project = projects.find((p) => p.id === c.projectId);
-                const account = accounts.find((a) => a.id === project?.accountId);
-                return (
-                  <li key={c.id} className="py-2 text-sm">
-                    <p className="font-medium">{c.title}</p>
-                    <p className="text-xs text-slate-500">{c.resolution}</p>
-                    <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs">
-                      {project && (
-                        <button type="button" onClick={() => onSelect({ kind: "project", id: project.id })} className="text-slate-400 hover:text-brand-600">
-                          {account?.name} › {project.name}
-                        </button>
-                      )}
-                      {canOpen(c.threadId) && (
-                        <Link href={`/inbox?thread=${c.threadId}`} className="text-brand-600 hover:underline">
-                          당시 대화
-                        </Link>
-                      )}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-          <div className="space-y-4">
-            <Card title="AI가 찾아볼 대화 기간" desc="오래된 대화는 지금과 조건이 다를 수 있어요. 기간을 줄이면 최근 대화만 찾아봐요.">
-              <select
-                aria-label="AI가 찾아볼 대화 기간"
-                value={range}
-                onChange={(e) => onRangeChange(e.target.value)}
-                className={cn(inputClass, "sm:w-48")}
-              >
-                {RANGES.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </Card>
-            <Card title={`사람이 고친 답장 ${learnedEdits}`} desc="AI 초안을 고쳐 보낸 건이에요. 모아서 한 번에 학습하면 다음 초안이 우리 회사 말투와 기준에 더 가까워져요." />
-          </div>
-        </div>
-      </Section>
+      <div className="space-y-3">
+        <PanelTabs
+          tabs={[
+            { key: "standard", label: "회사 기준", count: standard.length, icon: ShieldCheck },
+            { key: "company", label: "회사 자료", count: company.length, icon: BookOpen },
+            { key: "learned", label: "대화에서 배운 것", icon: MessagesSquare },
+          ]}
+          active={tab}
+          onChange={setTab}
+        />
+        {tab === "standard" && (
+          <>
+            <Desc>말투, 응대 원칙, 할인·승인 규칙처럼 모든 답장이 지켜야 하는 규칙이에요. 단가처럼 고객사마다 달라질 수 있는 건 회사 자료로 둬요. 팀장이 정해요.</Desc>
+            <DocList docs={standard} onOpen={onOpenDoc} />
+          </>
+        )}
+        {tab === "company" && (
+          <>
+            <Desc>단가표, 제품 소개서, 정비 가이드처럼 질문에 맞을 때 참고해요. 고객사·스페이스에 더 구체적인 자료가 있으면 그쪽을 따라요.</Desc>
+            <DocList docs={company} onOpen={onOpenDoc} />
+          </>
+        )}
+        {tab === "learned" && (
+          <>
+            <Desc>스페이스 대화에서 AI가 뽑아 회사 전체에서 쓰는 지식이에요.</Desc>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card title={`해결된 사례 ${SIMILAR_CASES.length}`} desc="끝난 대화에서 뽑은 문제와 해결 방법이에요. 비슷한 문의가 오면 다른 고객사 건에도 추천돼요.">
+                <ul className="divide-y divide-slate-100">
+                  {SIMILAR_CASES.map((c) => {
+                    const project = projects.find((p) => p.id === c.projectId);
+                    const account = accounts.find((a) => a.id === project?.accountId);
+                    return (
+                      <li key={c.id} className="py-2 text-sm">
+                        <p className="font-medium">{c.title}</p>
+                        <p className="text-xs text-slate-500">{c.resolution}</p>
+                        <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs">
+                          {project && (
+                            <button
+                              type="button"
+                              onClick={() => onSelect({ kind: "project", id: project.id })}
+                              className="text-slate-400 hover:text-brand-600"
+                            >
+                              {account?.name} › {project.name}
+                            </button>
+                          )}
+                          {canOpen(c.threadId) && (
+                            <Link href={`/inbox?thread=${c.threadId}`} className="text-brand-600 hover:underline">
+                              당시 대화
+                            </Link>
+                          )}
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </Card>
+              <div className="space-y-4">
+                <Card title="AI가 찾아볼 대화 기간" desc="오래된 대화는 지금과 조건이 다를 수 있어요. 기간을 줄이면 최근 대화만 찾아봐요.">
+                  <select
+                    aria-label="AI가 찾아볼 대화 기간"
+                    value={range}
+                    onChange={(e) => onRangeChange(e.target.value)}
+                    className={cn(inputClass, "sm:w-48")}
+                  >
+                    {RANGES.map((r) => (
+                      <option key={r.value} value={r.value}>
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                </Card>
+                <Card
+                  title={`사람이 고친 답장 ${learnedEdits}`}
+                  desc="AI 초안을 고쳐 보낸 건이에요. 모아서 한 번에 학습하면 다음 초안이 우리 회사 말투와 기준에 더 가까워져요."
+                />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-/** 고객사: 그 회사 모든 스페이스에 쓰는 공통 자료, 스페이스들, 스페이스별로 쌓인 자료 */
+/**
+ * 고객사: 그 회사 모든 스페이스에 쓰는 공통 자료와 스페이스 목록.
+ * 스페이스 자료는 답장에 섞어 쓰지 않으니 여기서 모아 보이지 않고, 스페이스를 눌러 본다
+ */
 export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "range"> & { id: string }) {
   const { docs, threads, projects, accounts, currentUser, role } = useDemo();
   const account = accounts.find((a) => a.id === id);
   if (!account) return null;
   const readable = visibleThreads(threads, currentUser, role);
   const list = projects.filter((p) => p.accountId === id).sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
-  const common = docs.filter((d) => d.accountId === id).sort(recent);
-  const projectDocs = docs.filter((d) => list.some((p) => p.id === d.projectId)).sort(recent);
+  const common = docs.filter((d) => d.accountId === id);
   const toCompany = () => onSelect({ kind: "company" });
 
   return (
@@ -170,10 +195,10 @@ export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "rang
         {common.length === 0 ? (
           <Empty>아직 없어요. 위쪽 자료 올리기에서 &ldquo;고객사 공통 자료&rdquo;로 올려요.</Empty>
         ) : (
-          <DocTable docs={common} onOpen={onOpenDoc} />
+          <DocList docs={common} onOpen={onOpenDoc} />
         )}
       </Section>
-      <Section icon={FolderKanban} title="스페이스" count={list.length}>
+      <Section icon={FolderKanban} title="스페이스" count={list.length} desc="스페이스 자료와 대화는 그 스페이스 답장에만 써요. 눌러서 봐요.">
         {list.length === 0 ? (
           <Empty>아직 스페이스가 없어요.</Empty>
         ) : (
@@ -204,22 +229,22 @@ export function AccountPanel({ id, onSelect, onOpenDoc }: Omit<PanelProps, "rang
           </div>
         )}
       </Section>
-      <Section icon={BookOpen} title="스페이스 자료 모아 보기" count={projectDocs.length} desc="스페이스마다 쌓인 자료를 한 번에 봐요. 답장에는 그 스페이스 자료만 써요.">
-        <DocTable docs={projectDocs} onOpen={onOpenDoc} showProject />
-      </Section>
     </div>
   );
 }
 
-/** 스페이스: 이 스페이스 답장에 AI가 찾아보는 범위와, 거기 쌓인 자료·대화·핵심 정보·해결된 사례 */
+type SpaceTab = "docs" | "chats" | "facts" | "cases";
+
+/** 스페이스: 함께 보는 위 단계 자료 한 줄, 그리고 탭으로 자료 / 대화 / 핵심 정보 / 해결된 사례 */
 export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { id: string }) {
   const { docs, threads, projects, accounts, currentUser, role } = useDemo();
+  const [tab, setTab] = useState<SpaceTab>("docs");
   const project = projects.find((p) => p.id === id);
   const account = accounts.find((a) => a.id === project?.accountId);
   if (!project || !account) return null;
   const readable = visibleThreads(threads, currentUser, role);
   const canOpen = (threadId?: string) => Boolean(threadId && readable.some((t) => t.id === threadId));
-  const projectDocs = docs.filter((d) => d.projectId === id).sort(recent);
+  const projectDocs = docs.filter((d) => d.projectId === id);
   const rooms = readable.filter((t) => t.projectIds.includes(id));
   // 본인과 팀장만 볼 수 있는 개인 연락은 목록에서 빼고 수만 알려 준다
   const hidden = threads.filter((t) => t.projectIds.includes(id)).length - rooms.length;
@@ -228,7 +253,7 @@ export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { 
   const toCompany = () => onSelect({ kind: "company" });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <ScopeHeader
         crumbs={[
           { label: "우리 회사", onClick: toCompany },
@@ -254,85 +279,144 @@ export function ProjectPanel({ id, range, onSelect, onOpenDoc }: PanelProps & { 
           },
         ]}
       />
-      <Section icon={BookOpen} title="스페이스 자료" count={projectDocs.length} desc="이 스페이스 답장에만 써요. 메일·메신저 첨부는 자동으로 쌓여요.">
-        <DocTable docs={projectDocs} onOpen={onOpenDoc} />
-      </Section>
-      <Section icon={MessagesSquare} title="대화" count={rooms.length} desc={`연결한 채팅방에서 이 스페이스로 쌓인 메시지만 써요(${rangeLabel(range)}). 개인 대화로 표시한 메시지는 빠져요.`}>
-        {rooms.length === 0 ? (
-          <Empty>연결한 채팅방이 없어요. 스페이스 화면의 채팅방 탭에서 연결해요.</Empty>
-        ) : (
-          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
-            {rooms.map((t) => {
-              const stored = t.messages.filter((m) => messageTags(t, m).includes(id)).length;
-              return (
-                <li key={t.id}>
-                  <Link href={`/inbox?thread=${t.id}`} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-slate-50">
-                    <ChannelBadge channel={t.channel} />
-                    <span className="min-w-0 flex-1 truncate font-medium">{roomName(t, currentUser.id)}</span>
-                    {t.projectIds.length > 1 && (
-                      <span className="hidden shrink-0 text-xs text-slate-400 sm:inline">다른 스페이스 {t.projectIds.length - 1}곳과 함께</span>
-                    )}
-                    <span className="shrink-0 text-xs text-slate-500">
-                      쌓인 메시지 {stored}/{t.messages.length}
-                    </span>
-                    <ChevronRight className="size-3.5 shrink-0 text-slate-300" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+      <div className="space-y-3">
+        <PanelTabs
+          tabs={[
+            { key: "docs", label: "자료", count: projectDocs.length, icon: BookOpen },
+            { key: "chats", label: "대화", count: rooms.length, icon: MessagesSquare },
+            { key: "facts", label: "핵심 정보", count: facts.length, icon: Lightbulb },
+            { key: "cases", label: "해결된 사례", count: cases.length, icon: Sparkles },
+          ]}
+          active={tab}
+          onChange={setTab}
+        />
+        {tab === "docs" && (
+          <>
+            <Desc>이 스페이스 답장에만 써요. 메일·메신저 첨부는 자동으로 쌓여요.</Desc>
+            {projectDocs.length === 0 ? <Empty>아직 자료가 없어요.</Empty> : <DocList docs={projectDocs} onOpen={onOpenDoc} />}
+          </>
         )}
-        {hidden > 0 && <p className="text-xs text-slate-400">채팅방 {hidden}개는 본인과 팀장만 볼 수 있어요.</p>}
-      </Section>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card title={`핵심 정보 ${facts.length}`} desc="문서와 대화에서 뽑은 납기·금액·일정이에요. 스페이스 개요에도 보여요.">
-          {facts.length === 0 ? (
-            <p className="text-xs text-slate-400">아직 뽑은 정보가 없어요.</p>
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {facts.map((f) => (
-                <li key={f.id} className="flex items-start gap-2 py-2 text-sm">
-                  <p className="min-w-0 flex-1">
-                    <span className="text-slate-500">{f.label}</span> {f.value}
-                  </p>
-                  {f.docId ? (
-                    <button type="button" onClick={() => onOpenDoc(f.docId!)} className="shrink-0 text-xs text-brand-600 hover:underline">
-                      문서
-                    </button>
-                  ) : (
-                    canOpen(f.threadId) && (
-                      <Link href={`/inbox?thread=${f.threadId}`} className="shrink-0 text-xs text-brand-600 hover:underline">
-                        대화
+        {tab === "chats" && (
+          <>
+            <Desc>연결한 채팅방에서 이 스페이스로 쌓인 메시지만 써요({rangeLabel(range)}). 개인 대화로 표시한 메시지는 빠져요.</Desc>
+            {rooms.length === 0 ? (
+              <Empty>연결한 채팅방이 없어요. 스페이스 화면의 채팅방 탭에서 연결해요.</Empty>
+            ) : (
+              <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+                {rooms.map((t) => {
+                  const stored = t.messages.filter((m) => messageTags(t, m).includes(id)).length;
+                  return (
+                    <li key={t.id}>
+                      <Link href={`/inbox?thread=${t.id}`} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-slate-50">
+                        <ChannelBadge channel={t.channel} />
+                        <span className="min-w-0 flex-1 truncate font-medium">{roomName(t, currentUser.id)}</span>
+                        {t.projectIds.length > 1 && (
+                          <span className="hidden shrink-0 text-xs text-slate-400 sm:inline">다른 스페이스 {t.projectIds.length - 1}곳과 함께</span>
+                        )}
+                        <span className="shrink-0 text-xs text-slate-500">
+                          쌓인 메시지 {stored}/{t.messages.length}
+                        </span>
+                        <ChevronRight className="size-3.5 shrink-0 text-slate-300" />
                       </Link>
-                    )
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-        <Card title={`해결된 사례 ${cases.length}`} desc="이 스페이스에서 해결한 문제예요. 비슷한 문의가 오면 다른 스페이스에도 추천돼요.">
-          {cases.length === 0 ? (
-            <p className="text-xs text-slate-400">아직 없어요. 끝난 대화에서 AI가 뽑아요.</p>
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {cases.map((c) => (
-                <li key={c.id} className="py-2 text-sm">
-                  <p className="font-medium">{c.title}</p>
-                  <p className="text-xs text-slate-500">{c.resolution}</p>
-                  {canOpen(c.threadId) && (
-                    <Link href={`/inbox?thread=${c.threadId}`} className="text-xs text-brand-600 hover:underline">
-                      당시 대화
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {hidden > 0 && <p className="text-xs text-slate-400">채팅방 {hidden}개는 본인과 팀장만 볼 수 있어요.</p>}
+          </>
+        )}
+        {tab === "facts" && (
+          <>
+            <Desc>문서와 대화에서 뽑은 납기·금액·일정이에요. 스페이스 개요에도 보여요.</Desc>
+            {facts.length === 0 ? (
+              <Empty>아직 뽑은 정보가 없어요.</Empty>
+            ) : (
+              <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white px-4">
+                {facts.map((f) => (
+                  <li key={f.id} className="flex items-start gap-2 py-2.5 text-sm">
+                    <p className="min-w-0 flex-1">
+                      <span className="text-slate-500">{f.label}</span> {f.value}
+                    </p>
+                    {f.docId ? (
+                      <button type="button" onClick={() => onOpenDoc(f.docId!)} className="shrink-0 text-xs text-brand-600 hover:underline">
+                        문서
+                      </button>
+                    ) : (
+                      canOpen(f.threadId) && (
+                        <Link href={`/inbox?thread=${f.threadId}`} className="shrink-0 text-xs text-brand-600 hover:underline">
+                          대화
+                        </Link>
+                      )
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+        {tab === "cases" && (
+          <>
+            <Desc>이 스페이스에서 해결한 문제예요. 비슷한 문의가 오면 다른 스페이스에도 추천돼요.</Desc>
+            {cases.length === 0 ? (
+              <Empty>아직 없어요. 끝난 대화에서 AI가 뽑아요.</Empty>
+            ) : (
+              <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white px-4">
+                {cases.map((c) => (
+                  <li key={c.id} className="py-2.5 text-sm">
+                    <p className="font-medium">{c.title}</p>
+                    <p className="text-xs text-slate-500">{c.resolution}</p>
+                    {canOpen(c.threadId) && (
+                      <Link href={`/inbox?thread=${c.threadId}`} className="text-xs text-brand-600 hover:underline">
+                        당시 대화
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
+}
+
+/** 범위 안의 탭. 스페이스 상세 화면 탭과 같은 모양 */
+function PanelTabs<K extends string>({
+  tabs,
+  active,
+  onChange,
+}: {
+  tabs: { key: K; label: string; count?: number; icon: LucideIcon }[];
+  active: K;
+  onChange: (key: K) => void;
+}) {
+  return (
+    <div role="tablist" className="flex gap-1 overflow-x-auto border-b border-slate-200">
+      {tabs.map((t) => (
+        <button
+          key={t.key}
+          type="button"
+          role="tab"
+          aria-selected={active === t.key}
+          onClick={() => onChange(t.key)}
+          className={cn(
+            "-mb-px flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm whitespace-nowrap",
+            active === t.key ? "border-brand-600 font-medium text-brand-700" : "border-transparent text-slate-500 hover:text-slate-700",
+          )}
+        >
+          <t.icon className="size-4" />
+          {t.label}
+          {t.count !== undefined && <span className="text-xs font-normal text-slate-400">{t.count}</span>}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Desc({ children }: { children: ReactNode }) {
+  return <p className="text-xs text-slate-500">{children}</p>;
 }
 
 function rangeLabel(range: string) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ChevronRight, FolderKanban, type LucideIcon } from "lucide-react";
+import { Building2, ChevronRight, FolderKanban, Search, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { useDemo } from "@/lib/demo-context";
@@ -13,7 +13,7 @@ const STATUS_ORDER: Record<Project["status"], number> = { "진행 중": 0, 대�
 
 /**
  * 왼쪽 트리: 우리 회사(공통) → 고객사 → 스페이스.
- * 진행 중인 스페이스가 없는 회사는 접어 둔다
+ * 진행 중인 스페이스가 없는 회사는 접어 둔다. 회사가 많아지면 위쪽 칸에 이름을 넣어 거른다
  */
 export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (scope: Scope) => void }) {
   const { accounts, projects, docs } = useDemo();
@@ -30,10 +30,29 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
     if (accountId) setCollapsed((prev) => prev.filter((x) => x !== accountId));
     onSelect(next);
   };
-
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  // 회사 이름이 맞으면 그 회사 스페이스를 모두, 스페이스 이름만 맞으면 그 스페이스만 보인다
+  const rows = accounts
+    .map((a) => {
+      const all = projectsOf(a.id);
+      const shown = !q || a.name.toLowerCase().includes(q) ? all : all.filter((p) => p.name.toLowerCase().includes(q));
+      return { account: a, all, shown, hit: !q || a.name.toLowerCase().includes(q) || shown.length > 0 };
+    })
+    .filter((r) => r.hit);
 
   return (
     <nav aria-label="지식 구조" className="rounded-xl border border-slate-200 bg-white p-2 text-sm">
+      <label className="mb-2 flex items-center gap-1.5 rounded-md border border-slate-200 px-2 focus-within:border-brand-400">
+        <Search className="size-3.5 shrink-0 text-slate-400" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="회사·스페이스 이름"
+          aria-label="회사·스페이스 이름으로 거르기"
+          className="h-7 min-w-0 flex-1 bg-transparent text-xs outline-none"
+        />
+      </label>
       <Row
         icon={Building2}
         label="우리 회사"
@@ -45,11 +64,12 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
       <div className="mt-3">
         <p className="flex items-center gap-1.5 px-2 pb-1 text-xs font-medium text-slate-400">
           <Building2 className="size-3.5" />
-          고객사 {accounts.length}
+          고객사 {q ? `${rows.length} / ${accounts.length}` : accounts.length}
         </p>
-        {accounts.map((a) => {
-          const list = projectsOf(a.id);
-          const open = !collapsed.includes(a.id);
+        {rows.length === 0 && <p className="px-2 py-3 text-xs text-slate-400">맞는 회사·스페이스가 없어요.</p>}
+        {rows.map(({ account: a, all, shown }) => {
+          // 거르는 중에는 맞는 것이 보이게 모두 편다
+          const open = q !== "" || !collapsed.includes(a.id);
           return (
             <div key={a.id}>
               <div className="flex items-center">
@@ -64,14 +84,14 @@ export function KnowledgeTree({ scope, onSelect }: { scope: Scope; onSelect: (sc
                 </button>
                 <Row
                   label={a.name}
-                  count={docs.filter((d) => d.accountId === a.id || list.some((p) => p.id === d.projectId)).length}
+                  count={docs.filter((d) => d.accountId === a.id || all.some((p) => p.id === d.projectId)).length}
                   active={scope.kind === "account" && scope.id === a.id}
                   onClick={() => select({ kind: "account", id: a.id })}
                 />
               </div>
               {open && (
                 <ul className="mb-1 ml-3 border-l border-slate-100 pl-2">
-                  {list.map((p) => (
+                  {shown.map((p) => (
                     <li key={p.id}>
                       <Row
                         icon={FolderKanban}

@@ -116,9 +116,9 @@ export function KnowledgeView() {
           ) : scope.kind === "company" ? (
             <CompanyPanel {...panelProps} onRangeChange={setRange} />
           ) : scope.kind === "account" ? (
-            <AccountPanel id={scope.id} onSelect={select} onOpenDoc={setOpenDocId} />
+            <AccountPanel key={scope.id} id={scope.id} onSelect={select} onOpenDoc={setOpenDocId} />
           ) : (
-            <ProjectPanel id={scope.id} {...panelProps} />
+            <ProjectPanel key={scope.id} id={scope.id} {...panelProps} />
           )}
         </div>
       </div>
