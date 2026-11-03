@@ -15,7 +15,8 @@ type Kind = "견적서" | "계약서";
 
 /**
  * 견적서·계약서 초안 (기능정리 2-7, 검토).
- * 회사 기준(단가표·표준 약관)과 스페이스 핵심 정보로 AI가 초안을 만들고, 사람이 확인해 스페이스 문서로 저장한다
+ * 단가표·표준 약관과 스페이스 핵심 정보로 AI가 초안을 만들고, 사람이 확인해 스페이스 문서로 저장한다.
+ * 단가는 가까운 자료가 이긴다: 고객사와 맺은 계약 단가가 있으면 그것, 없으면 회사 표준 단가표
  */
 export function DocDraftDialog({ project, onClose }: { project: Project; onClose: () => void }) {
   const { accounts, docs, addDoc, notify, logActivity, currentUser } = useDemo();
@@ -26,8 +27,11 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
   const total = items.reduce((sum, i) => sum + i.price, 0);
   // 금액·일정이 아닌 조건(납기, 설치 조건, 범위 등)만 계약·견적 조건으로 쓴다
   const conditions = PROJECT_FACTS.filter((f) => f.projectId === project.id && !/금액|결정권자|다음 일정|열린 요청|최근 이슈/.test(f.label));
-  const priceRule = docs.find((d) => d.id === "k3");
-  const termsRule = docs.find((d) => d.id === "k6");
+  const priceDoc =
+    docs.find((d) => d.accountId === project.accountId && d.kind === "계약서" && d.title.includes("단가")) ??
+    docs.find((d) => d.id === "k3");
+  const termsDoc = docs.find((d) => d.id === "k6");
+  const basis = kind === "견적서" ? priceDoc : termsDoc;
   const today = formatDate(DEMO_NOW);
 
   const save = () => {
@@ -41,7 +45,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
       ownerId: currentUser.id,
       priority: false,
       usedCount: 0,
-      summary: `AI가 회사 기준과 핵심 정보로 만든 ${kind} 초안이에요. 보내기 전에 사람이 확인해야 해요.`,
+      summary: `AI가 ${basis?.title ?? "회사 자료"}와 핵심 정보로 만든 ${kind} 초안이에요. 보내기 전에 사람이 확인해야 해요.`,
       highlights: items.map((i) => `${i.name} ${i.qty} ${formatAmount(i.price)}`),
     });
     notify(`'${project.name} ${kind} 초안'을 문서에 저장했어요.`);
@@ -55,7 +59,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
       onClose={onClose}
       size="lg"
       title="문서 초안 만들기"
-      description="회사 기준(단가표·표준 약관)과 이 스페이스의 핵심 정보로 AI가 초안을 만들어요. 보내기 전에 꼭 확인해 주세요."
+      description="단가표·표준 약관과 이 스페이스의 핵심 정보로 AI가 초안을 만들어요. 고객사와 맺은 계약 단가가 있으면 그 단가를 써요. 보내기 전에 꼭 확인해 주세요."
       footer={
         <>
           <Button onClick={() => notify("데모에서는 내려받기 대신 알림만 보여요.")}>
@@ -147,7 +151,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
                   </li>
                 ))}
                 {kind === "계약서" &&
-                  termsRule?.highlights.map((h) => (
+                  termsDoc?.highlights.map((h) => (
                     <li key={h}>· {h} (표준 약관)</li>
                   ))}
               </ul>
@@ -166,7 +170,7 @@ export function DocDraftDialog({ project, onClose }: { project: Project; onClose
       <p className="flex items-start gap-1.5 text-xs text-slate-500">
         <Sparkles className="mt-0.5 size-3.5 shrink-0 text-brand-600" />
         <span>
-          근거: {kind === "견적서" ? priceRule?.title : termsRule?.title} (회사 기준·회사 자료), 이 스페이스 핵심 정보 {conditions.length}개
+          근거: {basis?.title} ({basis?.accountId ? `${account?.name} 공통 자료` : "회사 자료"}), 이 스페이스 핵심 정보 {conditions.length}개
           {monday?.amount ? ", 먼데이 예상 금액" : ""}
         </span>
       </p>

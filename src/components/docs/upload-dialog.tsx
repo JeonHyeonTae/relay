@@ -15,7 +15,7 @@ const KINDS: DocKind[] = ["제안서", "견적서", "계약서", "회의록", "�
 
 /** 지식 베이스의 "AI가 답장할 때 보는 순서"와 같은 말로 고른다 */
 const USES: { value: DocLayer; title: string; desc: string }[] = [
-  { value: "standard", title: "회사 기준", desc: "모든 답장에 먼저 적용" },
+  { value: "standard", title: "회사 기준", desc: "늘 지키는 규칙" },
   { value: "company", title: "회사 자료", desc: "질문에 맞을 때 참고" },
   { value: "account", title: "고객사 공통 자료", desc: "그 회사 스페이스 답장에만" },
   { value: "project", title: "스페이스 자료", desc: "그 스페이스 답장에만" },
@@ -103,6 +103,11 @@ export function UploadDialog({ open, onClose, projectId, defaultAccountId }: Upl
             })}
           </div>
           {!canSetStandard && <p className="text-xs text-slate-500">회사 기준은 팀장이 정해요. 팀장으로 보기에서 고를 수 있어요.</p>}
+          {use === "standard" && (
+            <p className="text-xs text-slate-500">
+              회사 기준에는 말투, 응대 원칙, 할인·승인 규칙 같은 규칙만 둬요. 단가표처럼 고객사마다 달라질 수 있는 자료는 회사 자료로 올려요.
+            </p>
+          )}
         </div>
       )}
       <div className="grid grid-cols-2 gap-3">

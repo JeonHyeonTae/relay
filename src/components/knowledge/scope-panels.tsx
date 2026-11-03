@@ -56,21 +56,28 @@ export function CompanyPanel({ range, onRangeChange, onSelect, onOpenDoc }: Pane
   return (
     <div className="space-y-6">
       <ScopeHeader crumbs={[]} title="우리 회사" sub="모든 고객사 답장에 공통으로 쓰는 자료와 지식이에요." />
-      <SearchOrder
-        title="AI가 답장할 때 보는 순서"
-        steps={[
-          { label: "회사 기준", detail: `${standard.length}개` },
+      <HowAiAnswers
+        rules={standard.length}
+        facts={[
+          { label: "그 스페이스 자료·대화", detail: `자료 ${docs.filter((d) => d.projectId).length} · 채팅방 ${linkedChats} · ${rangeLabel(range)}` },
+          { label: "그 고객사 공통 자료", detail: `${accountDocs}개` },
           { label: "회사 자료", detail: `${company.length}개` },
-          { label: "고객사 공통 자료", detail: `${accountDocs}개 · 그 회사에만` },
-          { label: "스페이스 자료", detail: `${docs.filter((d) => d.projectId).length}개 · 그 스페이스에만` },
-          { label: "스페이스 대화", detail: `채팅방 ${linkedChats} · ${rangeLabel(range)}` },
         ]}
-        note="모든 고객사·스페이스 답장이 이 순서를 따라요. 앞 단계가 먼저 적용되고, 내용이 서로 다르면 앞 단계를 따라요."
       />
-      <Section icon={ShieldCheck} title="회사 기준" count={standard.length} desc="말투, 응대 원칙, 단가처럼 모든 답장이 지켜야 하는 자료예요. 팀장이 정해요.">
+      <Section
+        icon={ShieldCheck}
+        title="회사 기준"
+        count={standard.length}
+        desc="말투, 응대 원칙, 할인·승인 규칙처럼 모든 답장이 지켜야 하는 규칙이에요. 단가처럼 고객사마다 달라질 수 있는 건 회사 자료로 둬요. 팀장이 정해요."
+      >
         <DocTable docs={standard} onOpen={onOpenDoc} />
       </Section>
-      <Section icon={BookOpen} title="회사 자료" count={company.length} desc="제품 소개서, 정비 가이드처럼 질문에 맞을 때 참고해요.">
+      <Section
+        icon={BookOpen}
+        title="회사 자료"
+        count={company.length}
+        desc="단가표, 제품 소개서, 정비 가이드처럼 질문에 맞을 때 참고해요. 고객사·스페이스에 더 구체적인 자료가 있으면 그쪽을 따라요."
+      >
         <DocTable docs={company} onOpen={onOpenDoc} />
       </Section>
       <Section icon={MessagesSquare} title="대화에서 배운 것" desc="스페이스 대화에서 AI가 뽑아 회사 전체에서 쓰는 지식이에요.">
@@ -396,26 +403,44 @@ function AlsoUses({ items }: { items: { label: string; onClick: () => void }[] }
   );
 }
 
-/** AI가 답장할 때 보는 순서. 앞 단계가 먼저 적용되고, 서로 다르면 앞 단계를 따른다 (기능정리 5-3, 5-5) */
-function SearchOrder({ title, steps, note }: { title: string; steps: { label: string; detail: string }[]; note?: string }) {
+/**
+ * AI가 답장할 때 자료를 쓰는 법 (기능정리 5-3, 5-5).
+ * 회사 기준은 늘 지키는 규칙이라 모든 답장에 들어가고 다른 자료보다 우선한다.
+ * 나머지는 질문에 맞춰 찾는 사실 자료라, 내용이 서로 다르면 더 가까운(구체적인) 자료를 따른다
+ */
+function HowAiAnswers({ rules, facts }: { rules: number; facts: { label: string; detail: string }[] }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3">
-      <p className="text-xs font-medium text-slate-600">{title}</p>
-      <ol className="mt-2 flex flex-wrap items-center gap-1.5">
-        {steps.map((s, i) => (
-          <li key={s.label} className="flex items-center gap-1.5">
-            {i > 0 && <ChevronRight className="size-3.5 text-slate-300" />}
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1 text-xs">
-              <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
-                {i + 1}
-              </span>
-              <span className="font-medium text-slate-700">{s.label}</span>
-              <span className="text-slate-400">{s.detail}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
-      {note && <p className="mt-2 text-xs text-slate-500">{note}</p>}
+    <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+      <div className="flex items-start gap-2.5 p-3">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-brand-600" />
+        <p className="text-xs text-slate-500">
+          <span className="block font-medium text-slate-700">늘 지키는 규칙 · 회사 기준 {rules}개</span>
+          모든 답장에 들어가고, 다른 자료와 다르면 회사 기준을 따라요.
+        </p>
+      </div>
+      <div className="flex items-start gap-2.5 p-3">
+        <BookOpen className="mt-0.5 size-4 shrink-0 text-brand-600" />
+        <div className="min-w-0 text-xs text-slate-500">
+          <p>
+            <span className="block font-medium text-slate-700">질문에 맞춰 찾는 자료 · 내용이 다르면 가까운 자료를 따라요</span>
+            예: 고객사와 따로 맺은 단가 계약이 있으면 회사 단가표 대신 그 단가를 써요.
+          </p>
+          <ol className="mt-2 flex flex-wrap items-center gap-1.5">
+            {facts.map((s, i) => (
+              <li key={s.label} className="flex items-center gap-1.5">
+                {i > 0 && <ChevronRight className="size-3.5 text-slate-300" />}
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1">
+                  <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
+                    {i + 1}
+                  </span>
+                  <span className="font-medium text-slate-700">{s.label}</span>
+                  <span className="text-slate-400">{s.detail}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
     </div>
   );
 }

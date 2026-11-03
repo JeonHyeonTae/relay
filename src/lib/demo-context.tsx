@@ -81,7 +81,7 @@ interface DemoContextValue {
   replaceMember: (projectId: string, fromId: string, toId: string) => void;
   addProject: (project: Omit<Project, "id">) => void;
   addDoc: (doc: Omit<KnowledgeDoc, "id">) => void;
-  /** 회사 공통 문서를 회사 기준(모든 답장에 먼저 적용)으로 쓸지 */
+  /** 회사 공통 문서를 회사 기준(늘 지키는 규칙)으로 쓸지 */
   setDocPriority: (docId: string, on: boolean) => void;
   addChannelAccount: (account: Omit<ChannelAccount, "id" | "ownerId">) => void;
   updateChannelAccount: (id: string, patch: Partial<Pick<ChannelAccount, "label" | "shared">>) => void;

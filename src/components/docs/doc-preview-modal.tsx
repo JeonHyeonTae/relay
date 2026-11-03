@@ -99,7 +99,9 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
           <Building2 className="size-4 shrink-0 text-brand-600" />
           <p className="min-w-0 flex-1">
             <span className="font-medium">{account.name} 공통 자료예요</span>
-            <span className="block text-xs text-slate-500">{account.name}의 모든 스페이스 답장에 참고해요. 다른 회사 답장에는 쓰지 않아요.</span>
+            <span className="block text-xs text-slate-500">
+              {account.name}의 모든 스페이스 답장에 참고해요. 회사 자료와 내용이 다르면 이 자료를 따라요.
+            </span>
           </p>
         </div>
       )}
@@ -109,9 +111,11 @@ export function DocPreviewModal({ docId, onClose }: { docId: string | null; onCl
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
           <ShieldCheck className="size-4 shrink-0 text-brand-600" />
           <div className="min-w-0 flex-1 text-sm">
-            <p className="font-medium">{doc.priority ? "회사 기준으로 쓰는 자료예요" : "회사 자료예요"}</p>
+            <p className="font-medium">{doc.priority ? "회사 기준이에요" : "회사 자료예요"}</p>
             <p className="text-xs text-slate-500">
-              {doc.priority ? "모든 답장에 먼저 적용돼요." : "질문에 맞을 때만 참고해요. 회사 기준으로 바꾸면 모든 답장에 먼저 적용돼요."}
+              {doc.priority
+                ? "늘 지키는 규칙이에요. 모든 답장에 들어가고, 다른 자료와 다르면 이걸 따라요."
+                : "질문에 맞을 때 참고해요. 고객사·스페이스에 더 구체적인 자료가 있으면 그쪽을 따라요. 말투·승인 규칙처럼 늘 지켜야 하면 회사 기준으로 바꿔요."}
             </p>
           </div>
           {role === "lead" ? (

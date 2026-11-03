@@ -75,7 +75,7 @@ const mentions = (thread: Thread, name: string) =>
 
 /**
  * 스페이스를 열면 개요부터: 요약·지금 할 일·핵심 정보·최근 문서를 한 화면에.
- * 오른쪽에는 사람(참여자·고객사 연락처)과 모든 답장에 먼저 적용되는 회사 기준 (기능정리 3-2, 3-3, 5-1~5-3)
+ * 오른쪽에는 사람(참여자·고객사 연락처)과 모든 답장이 지키는 회사 기준, 이 고객사 공통 자료 (기능정리 3-2, 3-3, 5-1~5-3)
  */
 export function ProjectDetail({ id }: { id: string }) {
   const { projects, accounts, threads, docs, currentUser, role, removeMember, unlinkThread, notify, logActivity } = useDemo();
@@ -519,7 +519,7 @@ export function ProjectDetail({ id }: { id: string }) {
               </Link>
             }
           >
-            <p className="-mt-1 mb-3 text-xs text-slate-500">이 스페이스 문서보다 먼저, 모든 답장에 적용되는 자료예요.</p>
+            <p className="-mt-1 mb-3 text-xs text-slate-500">말투, 응대 원칙, 승인 규칙처럼 모든 답장이 지키는 규칙이에요.</p>
             <ul className="space-y-2">
               {companyDocs.map((d) => (
                 <li key={d.id}>
@@ -546,7 +546,7 @@ export function ProjectDetail({ id }: { id: string }) {
                 </Link>
               }
             >
-              <p className="-mt-1 mb-3 text-xs text-slate-500">이 회사 모든 스페이스 답장에 함께 참고하는 자료예요.</p>
+              <p className="-mt-1 mb-3 text-xs text-slate-500">이 회사 모든 스페이스 답장에 참고해요. 회사 자료와 다르면 이쪽을 따라요.</p>
               <ul className="space-y-2">
                 {commonDocs.map((d) => (
                   <li key={d.id}>

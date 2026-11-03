@@ -978,10 +978,28 @@ export const DOCS: KnowledgeDoc[] = [
     source: "upload",
     updatedAt: "2026-07-01",
     ownerId: "s2",
-    priority: true,
+    // 단가는 고객사마다 계약으로 달라질 수 있는 사실 자료라 회사 기준이 아니라 회사 자료로 둔다
+    priority: false,
     usedCount: 23,
-    summary: "검사장비·원심분리기 등 주요 장비의 2026년 표준 단가와 할인 기준.",
-    highlights: ["비전 검사장비 VX-500 표준가 2,600만원", "3대 이상 구매 시 최대 8% 할인", "설치·시운전비 별도 120만원"],
+    summary: "검사장비·원심분리기 등 주요 장비의 2026년 표준 단가. 고객사와 따로 맺은 계약 단가가 있으면 그쪽을 따른다.",
+    highlights: ["비전 검사장비 VX-500 표준가 2,600만원", "설치·시운전비 별도 120만원", "원심분리기 정기점검 1대 1회 140만원"],
+  },
+  {
+    id: "k11",
+    title: "견적·할인 승인 규칙",
+    category: "영업",
+    kind: "매뉴얼",
+    source: "upload",
+    updatedAt: "2026-10-20",
+    ownerId: "s2",
+    priority: true,
+    usedCount: 12,
+    summary: "견적과 할인에서 늘 지켜야 하는 규칙. 단가 자체는 단가표나 고객사 계약을 따르고, 이 규칙은 한도와 승인을 정한다.",
+    highlights: [
+      "표준가보다 낮게 견적할 때 할인 8%까지는 담당자, 넘으면 팀장 승인",
+      "고객사와 맺은 계약 단가가 있으면 그 단가로 견적 (따로 승인 필요 없음)",
+      "AI가 만든 견적 금액은 사람이 확인한 뒤 발송",
+    ],
   },
   {
     id: "k4",
@@ -1055,6 +1073,24 @@ export const DOCS: KnowledgeDoc[] = [
     usedCount: 2,
     summary: "한빛정밀의 발주·검수·대금 지급 절차. 모든 발주에 구매팀 PO 번호가 있어야 한다.",
     highlights: ["발주서에 구매팀 PO 번호 필수", "검수 완료 후 30일 안에 대금 지급", "세금계산서는 매월 말일에 모아 발행"],
+  },
+  {
+    id: "k12",
+    title: "한빛정밀 2026 연간 단가 계약",
+    category: "고객사",
+    kind: "계약서",
+    source: "email",
+    accountId: "a1",
+    updatedAt: "2026-07-01",
+    ownerId: "s3",
+    priority: false,
+    usedCount: 5,
+    summary: "한빛정밀과 맺은 2026년 연간 단가 계약. 한빛정밀 견적은 회사 표준 단가표 대신 이 단가를 따른다.",
+    highlights: [
+      "VX-500 계약 단가 2,280만원 (표준가 2,600만원)",
+      "설치·시운전 120만원 (표준가와 같음)",
+      "계약 기간 2026.01.01 ~ 12.31 (7월 하반기 단가 반영)",
+    ],
   },
   {
     id: "k9",
@@ -1433,11 +1469,14 @@ export const PROJECT_FACTS: ProjectFact[] = [
   { id: "f20", projectId: "p6", label: "다음 일정", value: "금요일 통화", threadId: "t6" },
 ];
 
-/** 견적서 초안에 쓰는 품목(만원). 회사 기준의 단가표와 스페이스 핵심 정보를 바탕으로 AI가 만든 것으로 본다 */
+/**
+ * 견적서 초안에 쓰는 품목(만원). 회사 단가표(고객사 계약 단가가 있으면 그 단가)와 스페이스 핵심 정보를 바탕으로
+ * AI가 만든 것으로 본다. 한빛정밀은 연간 단가 계약 단가를 쓴다
+ */
 export const QUOTE_ITEMS: Record<string, { name: string; qty: string; price: number }[]> = {
   p1: [
-    { name: "VX-500 비전 검사장비", qty: "1대", price: 2200 },
-    { name: "설치·시운전", qty: "1식", price: 200 },
+    { name: "VX-500 비전 검사장비", qty: "1대", price: 2280 },
+    { name: "설치·시운전", qty: "1식", price: 120 },
   ],
   p2: [{ name: "1공장 장비 유지보수 (연간)", qty: "1식", price: 960 }],
   p3: [
@@ -1492,7 +1531,7 @@ export const ACTIVITY: ActivityEntry[] = [
   { id: "act-5", at: "2026-10-29T10:20:00+09:00", staffId: "s2", text: "이도윤님 개인 메일 '내년 유지보수 계약 갱신 조건' 열람" },
   { id: "act-4", at: "2026-10-29T09:40:00+09:00", staffId: "s4", text: "'2025 정기점검 보고서' 원본 내려받기" },
   { id: "act-3", at: "2026-10-28T16:05:00+09:00", staffId: "s1", text: "#nuri-poc에 답장 발송" },
-  { id: "act-2", at: "2026-10-20T11:00:00+09:00", staffId: "s2", text: "'장비 표준 견적 단가표 2026'을 회사 기준으로 정함" },
+  { id: "act-2", at: "2026-10-20T11:00:00+09:00", staffId: "s2", text: "'견적·할인 승인 규칙'을 회사 기준으로 정함" },
   { id: "act-1", at: "2026-10-15T15:30:00+09:00", staffId: "s3", text: "'VX-500 견적서 v2' 올림 (2공장 검사장비 도입)" },
 ];
 

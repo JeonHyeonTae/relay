@@ -11,9 +11,10 @@ export function isStale(doc: KnowledgeDoc, staleMonths = STALE_DAYS / 30) {
 }
 
 /**
- * AI가 답장할 때 자료를 보는 순서 (기능정리 5-5).
- * standard: 회사 기준(모든 답장에 먼저), company: 회사 자료(맞을 때만),
- * account: 고객사 공통 자료(그 회사 스페이스 답장에만), project: 그 스페이스 자료
+ * 자료 단계 (기능정리 5-3, 5-5).
+ * standard: 회사 기준. 말투·응대 원칙·승인 규칙처럼 늘 지키는 규칙이라 모든 답장에 들어가고, 다른 자료와 다르면 이걸 따른다.
+ * company → account → project: 질문에 맞춰 찾는 사실 자료(회사 자료 → 고객사 공통 자료 → 스페이스 자료).
+ * 내용이 서로 다르면 더 가까운(구체적인) 쪽을 따른다: project > account > company
  */
 export type DocLayer = "standard" | "company" | "account" | "project";
 
