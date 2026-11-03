@@ -50,6 +50,8 @@ export interface Account {
   name: string;
   industry: string;
   contacts: Contact[];
+  /** 협력사(리셀러·파트너 등). 없으면 고객사. 지식 베이스에서 고객사와 나눠 보여 준다 */
+  partner?: boolean;
 }
 
 export interface Project {

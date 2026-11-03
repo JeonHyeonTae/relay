@@ -70,6 +70,7 @@ export const ACCOUNTS: Account[] = [
     id: "a5",
     name: "오름테크",
     industry: "IT 솔루션 · 해외 파트너",
+    partner: true,
     contacts: [{ name: "Daniel Kim", title: "Partnership Manager", role: "동남아 리셀러", email: "daniel.kim@orumtech.example" }],
   },
   {

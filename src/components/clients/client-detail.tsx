@@ -42,6 +42,7 @@ export function ClientDetail({ id }: { id: string }) {
 
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold">{account.name}</h1>
+        {account.partner && <Badge className="bg-violet-50 text-violet-700">협력사</Badge>}
         <Badge>{account.industry}</Badge>
         <Button variant="primary" className="ml-auto" onClick={() => setCreating(true)}>
           <Plus className="size-4" />새 프로젝트
